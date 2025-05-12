@@ -8,7 +8,17 @@ import org.bukkit.plugin.java.JavaPlugin
  * @author Willmo3
  */
 class RelicsPlugin: JavaPlugin() {
+    private val logger = LogHandler(super.logger)
+
     override fun onEnable() {
-        println("[RELICS] Relics plugin enabled!")
+        logger.info("Relics plugin enabled!")
+    }
+
+    override fun onDisable() {
+        logger.info("Relics plugin disabled!")
+    }
+
+    companion object {
+        const val PLUGIN_MESSAGE_PREFIX = "[RELICS]"
     }
 }
