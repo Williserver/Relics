@@ -59,6 +59,20 @@ class RelicSet(private val relicsToOwner: MutableMap<Relic, SUUID> = mutableMapO
             relicsToOwner[relic] = owner
         }
 
+    /**
+     * Removes a relic from the set of registered relics, effectively destroying it.
+     * If the relic is not registered, an exception is thrown.
+     *
+     * @param relic The relic to be removed from the set. Must be a registered relic.
+     * @throws IllegalArgumentException if the relic has not been registered in the set.
+     */
+    fun destroy(relic: Relic) {
+        if (relic !in relics()) {
+            throw IllegalArgumentException("$PLUGIN_MESSAGE_PREFIX: this relic has not been registered!")
+        }
+        relicsToOwner -= relic
+    }
+
     /*
      * Accessors
      */

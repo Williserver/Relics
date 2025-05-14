@@ -81,6 +81,15 @@ class RelicSetTest {
         )
     }
 
+    @Test
+    fun testDestroyRelic() {
+        val relic = Relic("Sword of Damocles", RelicRarity.Legendary)
+        val relicSet = RelicSet(mutableMapOf(Pair(relic, null)))
+        assert(relic in relicSet.relics())
+        relicSet.destroy(relic)
+        assert(relic !in relicSet.relics())
+    }
+
     /**
      * Tests the functionality of the `relicNamed` method in the `RelicSet` class.
      *
