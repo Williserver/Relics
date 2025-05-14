@@ -81,6 +81,17 @@ class RelicSetTest {
         )
     }
 
+    /**
+     * Tests the destruction functionality of a relic within the `RelicSet`.
+     *
+     * This test ensures that a relic can be successfully removed from the `RelicSet`.
+     * It begins by creating a `Relic` and adding it to the `RelicSet`. Then, the `destroy` method
+     * is invoked on the relic, and it is verified that the relic is no longer a part of the `RelicSet`.
+     *
+     * Assertions:
+     * - The relic exists in the `RelicSet` before destruction.
+     * - The relic does not exist in the `RelicSet` after destruction.
+     */
     @Test
     fun testDestroyRelic() {
         val relic = Relic("Sword of Damocles", RelicRarity.Legendary)

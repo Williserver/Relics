@@ -120,9 +120,7 @@ class RelicSet(private val relicsToOwner: MutableMap<Relic, SUUID> = mutableMapO
 
     override fun equals(other: Any?) = other is RelicSet && other.relics() == relics()
 
-    override fun hashCode(): Int {
-        return relicsToOwner.hashCode()
-    }
+    override fun hashCode() = relicsToOwner.hashCode()
 
     /*
      * File I/O helpers
