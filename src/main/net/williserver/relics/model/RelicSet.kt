@@ -77,8 +77,6 @@ class RelicSet(private val relicsToOwner: MutableMap<Relic, SUUID> = mutableMapO
      */
 
     /**
-     * Retrieves the owner of a specific relic if the relic is registered in the set.
-     *
      * @param relic The relic whose owner is to be retrieved. Must be a registered relic.
      * @return The UUID of the owner associated with the relic, or null if the relic has no owner.
      * @throws IllegalArgumentException if the relic is not registered in the set.
@@ -89,12 +87,16 @@ class RelicSet(private val relicsToOwner: MutableMap<Relic, SUUID> = mutableMapO
         } else relicsToOwner[relic]
 
     /**
-     * Finds a relic by its name within the set of tracked relics.
-     *
      * @param name The name of the relic to search for. Must match the name of the relic exactly.
      * @return The matching relic if found, or null if no relic with the specified name exists.
      */
     fun relicNamed(name: String) = relics().find { it.name == name }
+
+    /**
+     * @param relic The relic to check for membership in the set.
+     * @return whether the relic is in this set.
+     */
+    operator fun contains(relic: Relic) = relic in relicsToOwner.keys
 
     /**
      * @return an immutable set view of all relics tracked by this plugin.

@@ -4,7 +4,6 @@ import net.williserver.relics.LogHandler
 import net.williserver.relics.session.RelicEvent
 import net.williserver.relics.session.RelicEventBus
 import org.junit.jupiter.api.Assertions.assertThrows
-import org.junit.jupiter.api.assertThrows
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -27,9 +26,9 @@ class RelicSetTest {
     fun testRegisterRelic() {
         val relic = Relic( "Mace of Djibuttiron", RelicRarity.Unique)
         val relicSet = RelicSet()
-        assert(relic !in relicSet.relics())
+        assert(relic !in relicSet)
         relicSet.register(relic)
-        assert(relic in relicSet.relics())
+        assert(relic in relicSet)
     }
     
     /**
@@ -52,7 +51,7 @@ class RelicSetTest {
         val mace = Relic("Mace of Djibuttiron", RelicRarity.Unique)
         val sword = Relic("Sword of Rust", RelicRarity.Epic)
         val relicSet = RelicSet(mutableMapOf(Pair(mace, null), Pair(sword, null)))
-        relicSet.claim(mace, java.util.UUID.randomUUID())
+        relicSet.claim(mace, UUID.randomUUID())
 
         RelicSet.writeToFile(LogHandler(null), "testWrite.json", relicSet)
         val relicSet2 = RelicSet.readFromFile(LogHandler(null), "testWrite.json")
@@ -102,9 +101,9 @@ class RelicSetTest {
     fun testDestroyRelic() {
         val relic = Relic("Sword of Damocles", RelicRarity.Legendary)
         val relicSet = RelicSet(mutableMapOf(Pair(relic, null)))
-        assert(relic in relicSet.relics())
+        assert(relic in relicSet)
         relicSet.destroy(relic)
-        assert(relic !in relicSet.relics())
+        assert(relic !in relicSet)
 
         assertThrows(IllegalArgumentException::class.java) { relicSet.destroy(relic) }
     }
@@ -142,7 +141,7 @@ class RelicSetTest {
         bus.registerListener(RelicEvent.REGISTER, relicSet.constructRegisterListener())
         bus.fireEvent(RelicEvent.REGISTER, relic, UUID.randomUUID())
 
-        assert(relic in relicSet.relics())
+        assert(relic in relicSet)
     }
 
     /**
@@ -192,10 +191,10 @@ class RelicSetTest {
         val bus = RelicEventBus()
         bus.registerListener(RelicEvent.DESTROY, relicSet.constructDestroyListener())
 
-        assert(relic in relicSet.relics())
+        assert(relic in relicSet)
 
         bus.fireEvent(RelicEvent.DESTROY, relic, UUID.randomUUID())
-        assert(relic !in relicSet.relics())
+        assert(relic !in relicSet)
 
         assertThrows(IllegalArgumentException::class.java) { bus.fireEvent(RelicEvent.DESTROY, relic, UUID.randomUUID()) }
     }
