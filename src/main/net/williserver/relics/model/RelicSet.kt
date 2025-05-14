@@ -119,7 +119,10 @@ class RelicSet(private val relicsToOwner: MutableMap<Relic, SUUID> = mutableMapO
      */
     fun constructClaimListener(): RelicLifecycleListener = { relic, newOwner -> claim(relic, newOwner) }
 
-    // TODO: destroyListener
+    /**
+     * @return A RelicLifecycleListener that handles the destruction of relics.
+     */
+    fun constructDestroyListener(): RelicLifecycleListener = { relic, _ -> destroy(relic) }
 
     /*
      * Comparison helpers.

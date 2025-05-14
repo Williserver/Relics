@@ -105,6 +105,8 @@ class RelicSetTest {
         assert(relic in relicSet.relics())
         relicSet.destroy(relic)
         assert(relic !in relicSet.relics())
+
+        assertThrows(IllegalArgumentException::class.java) { relicSet.destroy(relic) }
     }
 
     /**
@@ -143,6 +145,17 @@ class RelicSetTest {
         assert(relic in relicSet.relics())
     }
 
+    /**
+     * Tests the claim listener functionality within the `RelicEventBus`.
+     *
+     * This test verifies that when the `CLAIM` event is fired for a relic,
+     * the listener created by `RelicSet.constructClaimListener` correctly assigns
+     * an owner to the relic within the `RelicSet`.
+     *
+     * Assertions:
+     * - Confirms that the owner of the relic is correctly updated to the claimant
+     *   after the `CLAIM` event is processed.
+     */
     @Test
     fun testRelicClaimListener() {
         val relic = Relic("test", RelicRarity.Common)
@@ -156,5 +169,34 @@ class RelicSetTest {
 
         bus.fireEvent(RelicEvent.CLAIM, relic, claimant)
         assert(relicSet.ownerOf(relic) == claimant)
+    }
+
+    /**
+     * Tests the functionality of the relic destruction listener within the `RelicEventBus`.
+     *
+     * Verifies that when the `DESTROY` event is fired for a relic, the listener created by
+     * `RelicSet.constructDestroyListener` appropriately removes the relic from the `RelicSet`.
+     *
+     * Assertions:
+     * - Confirms the relic is part of the relic set before the `DESTROY` event is fired.
+     * - Confirms the relic is no longer part of the relic set after the event is processed.
+     * - Ensures that attempting to fire the `DESTROY` event for an already removed relic
+     *   results in an `IllegalArgumentException`.
+     */
+    @Test
+    fun testRelicDestroyListener() {
+        val relic = Relic("test", RelicRarity.Common)
+        val relicSet = RelicSet()
+        relicSet.register(relic)
+
+        val bus = RelicEventBus()
+        bus.registerListener(RelicEvent.DESTROY, relicSet.constructDestroyListener())
+
+        assert(relic in relicSet.relics())
+
+        bus.fireEvent(RelicEvent.DESTROY, relic, UUID.randomUUID())
+        assert(relic !in relicSet.relics())
+
+        assertThrows(IllegalArgumentException::class.java) { bus.fireEvent(RelicEvent.DESTROY, relic, UUID.randomUUID()) }
     }
 }
