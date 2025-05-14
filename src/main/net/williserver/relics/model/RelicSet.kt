@@ -22,6 +22,7 @@ import java.util.UUID
  *
  * @constructor Initializes an empty relic set or populates it from the provided map of relics to owners.
  * @param relicsToOwner A map associating relics to their owners, with null indicating unclaimed relics.
+ * @author Willmo3
  */
 @Serializable
 class RelicSet(private val relicsToOwner: MutableMap<Relic, SUUID> = mutableMapOf()) {
@@ -78,12 +79,18 @@ class RelicSet(private val relicsToOwner: MutableMap<Relic, SUUID> = mutableMapO
      */
 
     /**
-     * Retrieves the owner of a specified relic.
+     * Retrieves the owner of a specific relic if the relic is registered in the set.
      *
-     * @param relic The relic whose owner is to be retrieved. Must be registered in the set.
-     * @return The owner UUID of the specified relic or null if the relic does not have an owner.
+     * @param relic The relic whose owner is to be retrieved. Must be a registered relic.
+     * @return The UUID of the owner associated with the relic, or null if the relic has no owner.
+     * @throws IllegalArgumentException if the relic is not registered in the set.
      */
-    fun ownerOf(relic: Relic) = relicsToOwner[relic]
+    fun ownerOf(relic: Relic): SUUID? {
+        if (relic !in relics()) {
+            throw IllegalArgumentException("$PLUGIN_MESSAGE_PREFIX: this relic has not been registered!")
+        }
+        return relicsToOwner[relic]
+    }
 
     /**
      * Finds a relic by its name within the set of tracked relics.

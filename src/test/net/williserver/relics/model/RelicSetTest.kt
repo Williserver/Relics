@@ -3,6 +3,8 @@ package net.williserver.relics.model
 import net.williserver.relics.LogHandler
 import net.williserver.relics.session.RelicEvent
 import net.williserver.relics.session.RelicEventBus
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.assertThrows
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -71,14 +73,18 @@ class RelicSetTest {
     fun testClaimRelic() {
         val mace = Relic("Mace of Djibuttiron", RelicRarity.Unique)
         val sword = Relic("Sword of Rust", RelicRarity.Epic)
-        val relicSet = RelicSet(mutableMapOf(Pair(mace, null), Pair(sword, null)))
-        val player = java.util.UUID.randomUUID()
+        val relicSet = RelicSet(mutableMapOf(Pair(mace, null)))
+        val player = UUID.randomUUID()
+
         assertNull(relicSet.ownerOf(mace))
         relicSet.claim(mace, player)
         assertEquals(
             relicSet.ownerOf(mace),
             player
         )
+
+        // attempting to view the owner of an unclaimed relic results in an exception.
+        assertThrows(IllegalArgumentException::class.java) { relicSet.ownerOf(sword) }
     }
 
     /**
