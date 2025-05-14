@@ -67,12 +67,10 @@ class RelicSet(private val relicsToOwner: MutableMap<Relic, SUUID> = mutableMapO
      * @param relic The relic to be removed from the set. Must be a registered relic.
      * @throws IllegalArgumentException if the relic has not been registered in the set.
      */
-    fun destroy(relic: Relic) {
+    fun destroy(relic: Relic) =
         if (relic !in relics()) {
             throw IllegalArgumentException("$PLUGIN_MESSAGE_PREFIX: this relic has not been registered!")
-        }
-        relicsToOwner -= relic
-    }
+        } else relicsToOwner -= relic
 
     /*
      * Accessors
@@ -85,12 +83,10 @@ class RelicSet(private val relicsToOwner: MutableMap<Relic, SUUID> = mutableMapO
      * @return The UUID of the owner associated with the relic, or null if the relic has no owner.
      * @throws IllegalArgumentException if the relic is not registered in the set.
      */
-    fun ownerOf(relic: Relic): SUUID? {
+    fun ownerOf(relic: Relic): SUUID? =
         if (relic !in relics()) {
             throw IllegalArgumentException("$PLUGIN_MESSAGE_PREFIX: this relic has not been registered!")
-        }
-        return relicsToOwner[relic]
-    }
+        } else relicsToOwner[relic]
 
     /**
      * Finds a relic by its name within the set of tracked relics.
@@ -150,7 +146,7 @@ class RelicSet(private val relicsToOwner: MutableMap<Relic, SUUID> = mutableMapO
             val writer = FileWriter(path)
             writer.write(format.encodeToString(relicSet))
             writer.close()
-            logger.info("Relic set written to file.")
+            logger.info("Relic set written to file at path $path.")
         }
 
         /**
@@ -167,7 +163,11 @@ class RelicSet(private val relicsToOwner: MutableMap<Relic, SUUID> = mutableMapO
                 return RelicSet()
             }
 
-            val jsonString = FileReader(path).readText()
+            val reader = FileReader(path)
+            val jsonString = reader.readText()
+            reader.close()
+            logger.info("Found relic set at $path, loading from file.")
+
             val relicSet = format.decodeFromString<RelicSet>(jsonString)
             logger.info("Relic set loaded from file.")
             return relicSet
