@@ -11,7 +11,7 @@ import kotlin.test.assertEquals
 class RelicTest {
     @Test
     fun testReadWriteRelic() {
-        val relic = Relic(UUID.randomUUID(), RelicRarity.Common, "Sword of Rust")
+        val relic = Relic("Sword of Rust", RelicRarity.Common)
         val relicString = Json.encodeToString(relic)
         val otherRelic = Json.decodeFromString<Relic>(relicString)
         assertEquals(relic, otherRelic)

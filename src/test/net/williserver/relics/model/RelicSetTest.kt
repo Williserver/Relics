@@ -11,7 +11,7 @@ import kotlin.test.assertEquals
 class RelicSetTest {
     @Test
     fun testRegisterRelic() {
-        val relic = Relic(UUID.randomUUID(), RelicRarity.Unique, "Mace of Djibuttiron")
+        val relic = Relic( "Mace of Djibuttiron", RelicRarity.Unique)
         val relicSet = RelicSet()
         assert(relic !in relicSet.relics())
         relicSet.register(relic)
@@ -20,8 +20,8 @@ class RelicSetTest {
     
     @Test
     fun testWriteReadRelic() {
-        val mace = Relic(UUID.randomUUID(), RelicRarity.Unique, "Mace of Djibuttiron")
-        val sword = Relic(UUID.randomUUID(), RelicRarity.Epic, "Sword of Rust")
+        val mace = Relic("Mace of Djibuttiron", RelicRarity.Unique)
+        val sword = Relic("Sword of Rust", RelicRarity.Epic)
         val relicSet = RelicSet(mutableSetOf(mace, sword))
 
         RelicSet.writeToFile(LogHandler(null), "testWrite.json", relicSet)
