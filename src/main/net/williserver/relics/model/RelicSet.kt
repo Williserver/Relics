@@ -10,6 +10,7 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import net.williserver.relics.session.RelicLifecycleListener
 import java.io.FileWriter
 import java.io.File
 import java.io.FileReader
@@ -87,7 +88,11 @@ class RelicSet(private val relicsToOwner: MutableMap<Relic, SUUID> = mutableMapO
      * Listeners
      */
 
-    // TODO: registerListener
+    /**
+     * @return A RelicLifecycleListener instance that registers relics upon invocation.
+     */
+    fun constructRegisterListener(): RelicLifecycleListener = { relic, _ -> register(relic) }
+
     // TODO: claimListener
     // TODO: destroyListener
 

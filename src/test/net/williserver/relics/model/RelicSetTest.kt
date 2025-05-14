@@ -1,6 +1,8 @@
 package net.williserver.relics.model
 
 import net.williserver.relics.LogHandler
+import net.williserver.relics.session.RelicEvent
+import net.williserver.relics.session.RelicEventBus
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -91,5 +93,16 @@ class RelicSetTest {
         val relic = Relic("Mace of Djibuttiron", RelicRarity.Unique)
         val relicSet = RelicSet(mutableMapOf(Pair(relic, null)))
         assertEquals(relicSet.relicNamed("Mace of Djibuttiron"), relic)
+    }
+
+    @Test
+    fun testRelicRegisterListener() {
+        // TODO: relic assert name not empty
+        val relic = Relic("test", RelicRarity.Common)
+        val relicSet = RelicSet()
+
+        val bus = RelicEventBus()
+        bus.registerListener(RelicEvent.REGISTER, relicSet.constructRegisterListener())
+        bus.fireEvent(RelicEvent.REGISTER, relic, java.util.UUID.randomUUID())
     }
 }
