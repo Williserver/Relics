@@ -16,9 +16,11 @@ import java.io.FileReader
 import java.util.UUID
 
 /**
- * Set of tracked relics and their owners, if they have one.
+ * Represents a collection of relics and their ownership information. Provides functionality to register,
+ * claim, and retrieve relics, as well as to handle file operations for persistence.
  *
- * @author Willmo3
+ * @constructor Initializes an empty relic set or populates it from the provided map of relics to owners.
+ * @param relicsToOwner A map associating relics to their owners, with null indicating unclaimed relics.
  */
 @Serializable
 class RelicSet(private val relicsToOwner: MutableMap<Relic, SUUID> = mutableMapOf()) {
@@ -27,8 +29,10 @@ class RelicSet(private val relicsToOwner: MutableMap<Relic, SUUID> = mutableMapO
      */
 
     /**
-     * @param relic new relic to register in this set.
-     * @throws IllegalArgumentException if this relic is identical to another which has already been registered.
+     * Registers a relic in the set, if it has not already been registered.
+     *
+     * @param relic The relic to be added to the set. Must not already exist in the set.
+     * @throws IllegalArgumentException if the relic has already been registered.
      */
     fun register(relic: Relic) =
         if (relic in relics()) {
@@ -37,9 +41,34 @@ class RelicSet(private val relicsToOwner: MutableMap<Relic, SUUID> = mutableMapO
             relicsToOwner.put(relic, null)
         }
 
+    /**
+     * Assigns an owner to a relic, marking it as claimed if it has not already been claimed or registered.
+     *
+     * @param relic The relic to be claimed by the owner.
+     * @param owner The UUID of the owner claiming the relic.
+     * @throws IllegalArgumentException if the relic is not registered in the set.
+     * @throws IllegalArgumentException if the relic has already been claimed by another owner.
+     */
+    fun claim(relic: Relic, owner: UUID) =
+        if (relic !in relics()) {
+            throw IllegalArgumentException("$PLUGIN_MESSAGE_PREFIX: this relic has not been registered!")
+        } else if (relicsToOwner[relic] != null) {
+            throw IllegalArgumentException("$PLUGIN_MESSAGE_PREFIX: this relic has already been claimed!")
+        } else {
+            relicsToOwner[relic] = owner
+        }
+
     /*
      * Accessors
      */
+
+    /**
+     * Retrieves the owner of a specified relic.
+     *
+     * @param relic The relic whose owner is to be retrieved. Must be registered in the set.
+     * @return The owner UUID of the specified relic or null if the relic does not have an owner.
+     */
+    fun ownerOf(relic: Relic) = relicsToOwner[relic]
 
     /**
      * @return an immutable set view of all relics tracked by this plugin.
