@@ -3,6 +3,7 @@ package net.williserver.relics.model
 import net.williserver.relics.LogHandler
 import net.williserver.relics.session.RelicEvent
 import net.williserver.relics.session.RelicEventBus
+import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -95,14 +96,39 @@ class RelicSetTest {
         assertEquals(relicSet.relicNamed("Mace of Djibuttiron"), relic)
     }
 
+    /**
+     * Tests the functionality of the relic registration listener within the `RelicEventBus`.
+     *
+     * Verifies that when the `REGISTER` event is fired for a relic, the appropriate listener
+     * defined in the `RelicSet` correctly handles the event by registering the relic.
+     *
+     * Assertions:
+     * - Confirms that the relic is successfully added to the relic set after the event is fired.
+     */
     @Test
     fun testRelicRegisterListener() {
-        // TODO: relic assert name not empty
         val relic = Relic("test", RelicRarity.Common)
         val relicSet = RelicSet()
 
         val bus = RelicEventBus()
         bus.registerListener(RelicEvent.REGISTER, relicSet.constructRegisterListener())
-        bus.fireEvent(RelicEvent.REGISTER, relic, java.util.UUID.randomUUID())
+        bus.fireEvent(RelicEvent.REGISTER, relic, UUID.randomUUID())
+
+        assert(relic in relicSet.relics())
+    }
+
+    @Test
+    fun testRelicClaimListener() {
+        val relic = Relic("test", RelicRarity.Common)
+        val relicSet = RelicSet()
+        relicSet.register(relic)
+
+        val bus = RelicEventBus()
+        bus.registerListener(RelicEvent.CLAIM, relicSet.constructClaimListener())
+
+        val claimant = UUID.randomUUID()
+
+        bus.fireEvent(RelicEvent.CLAIM, relic, claimant)
+        assert(relicSet.ownerOf(relic) == claimant)
     }
 }

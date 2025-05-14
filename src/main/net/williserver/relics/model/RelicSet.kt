@@ -93,7 +93,11 @@ class RelicSet(private val relicsToOwner: MutableMap<Relic, SUUID> = mutableMapO
      */
     fun constructRegisterListener(): RelicLifecycleListener = { relic, _ -> register(relic) }
 
-    // TODO: claimListener
+    /**
+     * @return A RelicLifecycleListener that assigns an owner to a relic when triggered.
+     */
+    fun constructClaimListener(): RelicLifecycleListener = { relic, newOwner -> claim(relic, newOwner) }
+
     // TODO: destroyListener
 
     /*
