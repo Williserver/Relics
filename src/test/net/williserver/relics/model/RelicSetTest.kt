@@ -77,4 +77,19 @@ class RelicSetTest {
             player
         )
     }
+
+    /**
+     * Tests the functionality of the `relicNamed` method in the `RelicSet` class.
+     *
+     * Ensures that a relic can be retrieved by its name when it is part of the `RelicSet`.
+     *
+     * Assertions:
+     * - Confirms that the retrieved relic matches the one registered in the `RelicSet`.
+     */
+    @Test
+    fun testRelicFromName() {
+        val relic = Relic("Mace of Djibuttiron", RelicRarity.Unique)
+        val relicSet = RelicSet(mutableMapOf(Pair(relic, null)))
+        assertEquals(relicSet.relicNamed("Mace of Djibuttiron"), relic)
+    }
 }
