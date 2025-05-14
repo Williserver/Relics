@@ -1,12 +1,19 @@
 package net.williserver.relics.model
 
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import net.williserver.relics.LogHandler
 import net.williserver.relics.RelicsPlugin.Companion.PLUGIN_MESSAGE_PREFIX
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import java.io.FileWriter
 import java.io.File
 import java.io.FileReader
+import java.util.UUID
 
 /**
  * Set of tracked relics and their owners, if they have one.
@@ -14,7 +21,7 @@ import java.io.FileReader
  * @author Willmo3
  */
 @Serializable
-class RelicSet(private val allRelics: MutableSet<Relic> = mutableSetOf()) {
+class RelicSet(private val relicsToOwner: MutableMap<Relic, SUUID> = mutableMapOf()) {
     /*
      * Mutators
      */
@@ -27,7 +34,7 @@ class RelicSet(private val allRelics: MutableSet<Relic> = mutableSetOf()) {
         if (relic in relics()) {
             throw IllegalArgumentException("$PLUGIN_MESSAGE_PREFIX: this relic has already been registered!")
         } else {
-            allRelics += relic
+            relicsToOwner.put(relic, null)
         }
 
     /*
@@ -37,7 +44,7 @@ class RelicSet(private val allRelics: MutableSet<Relic> = mutableSetOf()) {
     /**
      * @return an immutable set view of all relics tracked by this plugin.
      */
-    fun relics() = allRelics.toSet()
+    fun relics() = relicsToOwner.keys.toSet()
 
     /*
      * Comparison helpers.
@@ -46,7 +53,7 @@ class RelicSet(private val allRelics: MutableSet<Relic> = mutableSetOf()) {
     override fun equals(other: Any?) = other is RelicSet && other.relics() == relics()
 
     override fun hashCode(): Int {
-        return allRelics.hashCode()
+        return relicsToOwner.hashCode()
     }
 
     /*
@@ -54,6 +61,8 @@ class RelicSet(private val allRelics: MutableSet<Relic> = mutableSetOf()) {
      */
 
     companion object {
+        private val format = Json { allowStructuredMapKeys=true; prettyPrint=true }
+
         /**
          * Writes the provided relics set to a file in JSON format and logs the operation.
          *
@@ -63,7 +72,7 @@ class RelicSet(private val allRelics: MutableSet<Relic> = mutableSetOf()) {
          */
         fun writeToFile(logger: LogHandler, path: String, relicSet: RelicSet) {
             val writer = FileWriter(path)
-            writer.write(Json.encodeToString(relicSet))
+            writer.write(format.encodeToString(relicSet))
             writer.close()
             logger.info("Relic set written to file.")
         }
@@ -83,9 +92,43 @@ class RelicSet(private val allRelics: MutableSet<Relic> = mutableSetOf()) {
             }
 
             val jsonString = FileReader(path).readText()
-            val relicSet = Json.decodeFromString<RelicSet>(jsonString)
+            val relicSet = format.decodeFromString<RelicSet>(jsonString)
             logger.info("Relic set loaded from file.")
             return relicSet
+        }
+    }
+}
+
+
+/**
+ * A typealias for a nullable UUID with a custom serializer for Kotlin serialization.
+ * Represents an optional UUID field serialized with `optionalUUIDSerializer`.
+ * If the UUID is null, it is serialized as the string "none".
+ */
+typealias SUUID = @Serializable(with = OptionalUUIDSerializer::class) UUID?
+
+/**
+ * Custom serializer for a nullable UUID.
+ * Credit: https://github.com/perracodex/Kotlinx-UUID-Serializer
+ *
+ * @author Willmo3
+ */
+object OptionalUUIDSerializer : KSerializer<UUID?> {
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("UUID", PrimitiveKind.STRING)
+
+    override fun serialize(encoder: Encoder, value: UUID?) =
+        if (value == null) {
+            encoder.encodeString("none")
+        } else {
+            encoder.encodeString(value.toString())
+        }
+
+    override fun deserialize(decoder: Decoder): UUID? {
+        val decodedString = decoder.decodeString()
+        return if (decodedString == "none") {
+            null
+        } else {
+            UUID.fromString(decodedString)
         }
     }
 }
