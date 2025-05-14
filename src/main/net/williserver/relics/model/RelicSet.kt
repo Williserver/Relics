@@ -62,6 +62,8 @@ class RelicSet(private val relicsToOwner: MutableMap<Relic, SUUID> = mutableMapO
      * Accessors
      */
 
+    // TODO: get relic by name
+
     /**
      * Retrieves the owner of a specified relic.
      *
@@ -74,6 +76,14 @@ class RelicSet(private val relicsToOwner: MutableMap<Relic, SUUID> = mutableMapO
      * @return an immutable set view of all relics tracked by this plugin.
      */
     fun relics() = relicsToOwner.keys.toSet()
+
+    /*
+     * Listeners
+     */
+
+    // TODO: registerListener
+    // TODO: claimListener
+    // TODO: destroyListener
 
     /*
      * Comparison helpers.
