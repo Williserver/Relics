@@ -22,4 +22,10 @@ enum class RelicRarity() {
  * @author Willmo3
  */
 @Serializable
-data class Relic(val name: String, val rarity: RelicRarity)
+data class Relic(val name: String, val rarity: RelicRarity) {
+    init {
+        if (name.isEmpty()) {
+            throw IllegalArgumentException("Relic name cannot be empty!")
+        }
+    }
+}
