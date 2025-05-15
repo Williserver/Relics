@@ -1,5 +1,7 @@
 package net.williserver.relics.commands
 
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import net.williserver.relics.model.RelicSet
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
@@ -13,9 +15,30 @@ import org.bukkit.command.CommandSender
  * @author Willmo3
  */
 class RelicsCommand(private val relicSet: RelicSet): CommandExecutor {
-    override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
-        TODO("Not yet implemented")
-    }
+
+    /**
+     * Handles the execution of a command related to relics.
+     *
+     * This method processes the command sent by the specified sender
+     * and determines the appropriate action to take based on the provided arguments.
+     * If no arguments are provided, it defaults to sending a help message to the sender.
+     *
+     * @param sender Source of the command, such as a player or the console.
+     * @param command Command being executed.
+     * @param label Alias used for the command.
+     * @param args Arguments for subcommand
+     * @return Whether the command was invoked with the correct number of arguments.
+     */
+    override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>) =
+        if (args.isNotEmpty()) {
+            val subcommand = args[0]
+            val execute = RelicSubcommandExecutor(sender, args.drop(1), relicSet)
+
+            when (subcommand) {
+                "help" -> execute.help()
+                else -> false
+            }
+        } else RelicSubcommandExecutor(sender, args.toList(), relicSet).help()
 
 /**
  * Handles the execution of subcommands related to relics.
@@ -33,6 +56,22 @@ private class RelicSubcommandExecutor(
     private val args: List<String>,
     private val relicSet: RelicSet
 ) {
+    /**
+     * Sends a help message to the command sender containing details about available commands.
+     * @return True after successfully sending the help message.
+     */
+    fun help(): Boolean {
+        val header = prefixedMessage(Component.text("Commands:"))
+        val bullet = Component.text("\n- /relics ", NamedTextColor.GOLD)
+
+        fun generateCommandHelp(name: String, text: String)
+            = bullet.append(Component.text("$name: ", NamedTextColor.RED).append(Component.text(text, NamedTextColor.GRAY)))
+
+        val help = generateCommandHelp("help", "pull up this help menu")
+        s.sendMessage(header.append(help))
+        return true
+    }
+
     // TODO: register relic
     // -- given an item in your hand, add its relic name as an NBT tag.
     // -- add its name to the relic list.
