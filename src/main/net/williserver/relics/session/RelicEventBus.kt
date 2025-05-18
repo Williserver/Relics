@@ -26,10 +26,10 @@ enum class RelicListenerType {
 /**
  * Listener function registered to a specific event.
  * @param relic Relic impacted by command invocation
- * @param agent Player who caused the event.
+ * @param agent Player who caused the event, if applicable.
  * @param item Item stack associated with the event, if applicable.
  */
-typealias RelicLifecycleListener = (relic: Relic, agent: UUID, item: ItemStack?) -> Unit
+typealias RelicLifecycleListener = (relic: Relic, agent: UUID?, item: ItemStack?) -> Unit
 
 /**
  * Event bus for major events in a relic's lifecycle.
@@ -63,10 +63,10 @@ class RelicEventBus {
      *
      * @param event The relic lifecycle event to be triggered.
      * @param relic The relic associated with the event.
-     * @param agent The UUID of the agent or entity responsible for the event.
+     * @param agent The UUID of the agent or entity responsible for the event, if applicable.
      * @param item The item stack associated with the event, if applicable.
      */
-    fun fireEvent(event: RelicEvent, relic: Relic, agent: UUID, item: ItemStack? = null) {
+    fun fireEvent(event: RelicEvent, relic: Relic, agent: UUID? = null, item: ItemStack? = null) {
         // Ensure that listeners are fired in order using explicit for loop
         for (i in RelicListenerType.entries.indices) {
             listeners[Pair(event, RelicListenerType.entries[i])]!!.forEach { it(relic, agent, item) }

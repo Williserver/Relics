@@ -32,10 +32,14 @@ class RelicsPlugin: JavaPlugin() {
         val eventBus = RelicEventBus()
         /* Core model listeners. */
         eventBus.registerListener(RelicEvent.REGISTER, RelicListenerType.MODEL, relicSet.constructRegisterListener())
+        eventBus.registerListener(RelicEvent.DESTROY, RelicListenerType.MODEL, relicSet.constructDestroyListener())
         /* Integration listeners. */
-        val integrator = RelicItemStackIntegrator(this)
+        val integrator = RelicItemStackIntegrator(this, relicSet, eventBus)
         eventBus.registerListener(RelicEvent.REGISTER, RelicListenerType.INTEGRATION, integrator.constructRegisterItemStackListener())
         logger.info("Finished registering relic lifecycle listeners.")
+
+        /* Register in-game event listeners. */
+        server.pluginManager.registerEvents(integrator.constructRelicRemoveListener(), this)
 
         /* Register commands.*/
         getCommand("relics")!!.setExecutor(RelicsCommand(relicSet, eventBus))
