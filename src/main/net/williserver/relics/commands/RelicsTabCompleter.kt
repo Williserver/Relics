@@ -33,7 +33,10 @@ class RelicsTabCompleter: TabCompleter {
 
         // Subcommand suggestions
         when (args.size) {
-            1 -> completions.add("help")
+            1 -> {
+                completions.add("help")
+                completions.add("register")
+            }
         }
 
         return completions

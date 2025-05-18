@@ -3,6 +3,16 @@ package net.williserver.relics.commands
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.williserver.relics.RelicsPlugin
+import org.bukkit.command.CommandSender
+
+/**
+ * Send a red-colored error message to a target.
+ *
+ * @param target Entity to receive error.
+ * @param message Error to format and send to target.
+ */
+fun sendErrorMessage(target: CommandSender, message: String)
+        = target.sendMessage(prefixedMessage(Component.text(message, NamedTextColor.RED)))
 
 /**
  * Append a message prefix component onto a message component.

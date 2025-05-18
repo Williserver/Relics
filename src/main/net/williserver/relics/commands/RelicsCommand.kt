@@ -6,6 +6,7 @@ import net.williserver.relics.model.RelicSet
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
+import org.bukkit.entity.Player
 
 /**
  * The RelicsCommand class represents a command related to relics.
@@ -36,6 +37,7 @@ class RelicsCommand(private val relicSet: RelicSet): CommandExecutor {
 
             when (subcommand) {
                 "help" -> execute.help()
+                "register" -> execute.register()
                 else -> false
             }
         } else RelicSubcommandExecutor(sender, args.toList(), relicSet).help()
@@ -56,6 +58,9 @@ private class RelicSubcommandExecutor(
     private val args: List<String>,
     private val relicSet: RelicSet
 ) {
+    // Create a validator for this sender.
+    private val v = RelicsCommandValidator(s)
+
     /**
      * Sends a help message to the command sender containing details about available commands.
      * @return True after successfully sending the help message.
@@ -72,16 +77,69 @@ private class RelicSubcommandExecutor(
         return true
     }
 
+
+    /**
+     * Validates the command sender, ensures they are holding a single item, and checks if the item's name is valid.
+     *
+     * This method performs the following checks in order:
+     * - Ensures the sender is a valid player.
+     * - Confirms the player is holding a single item in their hand.
+     * - Validates the display name of the item in the player's main hand.
+     *
+     * Each validation step sends an error message to the sender if the check fails.
+     *
+     * @return Whether all validations pass.
+     */
+    fun register(): Boolean {
+        if (!v.assertValidPlayer()
+            || !v.assertSingleItemHeld()) {
+            return true
+        }
+
+        val name = (s as Player).inventory.itemInMainHand.displayName().examinableName()
+        if (!v.assertValidName(name) || !v.assertUniqueName(name, relicSet)) {
+            return true
+        }
+
+        return true
+    }
+
     // TODO: register relic
     // -- given an item in your hand, add its relic name as an NBT tag.
     // -- add its name to the relic list.
+
+    // Validate:
+    // -- Sender is player
+    // -- Exactly one item in hand. (i.e. itemstack size 1)
+    // -- Name is valid -- i.e. nonempty, nothing dangerous for serialization
+    // TODO: VALIDNAME
+
+    // Remove the item from their inventory
+    // Add a copy of the item with added metadata
+    // Place in the list
+
+    // TODO: relic info
+    // -- given an item in your hand, check if it is a relic.
+    // -- if so, report information.
+
+    // Validate:
+    // -- Sender is player
+
+    // Return
+    // -- Information about the item, or nothing if no info.
 
     // TODO: claim relic
     // -- given an item in your hand, check if it's a relic
     // -- if so, mark you as the new owner of the relic.
 
+    // Validate:
+    // -- Sender is player
+
+    // Report:
+    // -- Whether you claimed the relic or not.
+
     // TODO: list relics
-    // -- report a list of all relics on the server to player.
+    // -- report a list of all relics on the server to sender.
 
     // TODO: top players
     // -- report a list of players, sorted by the value of the relics they own.
