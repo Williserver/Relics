@@ -3,6 +3,7 @@ package net.williserver.relics.model
 import net.williserver.relics.LogHandler
 import net.williserver.relics.session.RelicEvent
 import net.williserver.relics.session.RelicEventBus
+import net.williserver.relics.session.RelicListenerType
 import org.junit.jupiter.api.Assertions.assertThrows
 import java.util.UUID
 import kotlin.test.Test
@@ -138,7 +139,7 @@ class RelicSetTest {
         val relicSet = RelicSet()
 
         val bus = RelicEventBus()
-        bus.registerListener(RelicEvent.REGISTER, relicSet.constructRegisterListener())
+        bus.registerListener(RelicEvent.REGISTER, RelicListenerType.MODEL,relicSet.constructRegisterListener())
         bus.fireEvent(RelicEvent.REGISTER, relic, UUID.randomUUID())
 
         assert(relic in relicSet)
@@ -162,7 +163,7 @@ class RelicSetTest {
         relicSet.register(relic)
 
         val bus = RelicEventBus()
-        bus.registerListener(RelicEvent.CLAIM, relicSet.constructClaimListener())
+        bus.registerListener(RelicEvent.CLAIM, RelicListenerType.MODEL,relicSet.constructClaimListener())
 
         val claimant = UUID.randomUUID()
 
@@ -189,7 +190,7 @@ class RelicSetTest {
         relicSet.register(relic)
 
         val bus = RelicEventBus()
-        bus.registerListener(RelicEvent.DESTROY, relicSet.constructDestroyListener())
+        bus.registerListener(RelicEvent.DESTROY, RelicListenerType.MODEL, relicSet.constructDestroyListener())
 
         assert(relic in relicSet)
 

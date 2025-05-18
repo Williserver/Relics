@@ -17,7 +17,7 @@ fun sendErrorMessage(target: CommandSender, message: String)
 /**
  * Send a green colored congratulatory message to a target.
  *
- * @param target Entity to recieve message.
+ * @param target Entity to receive message.
  * @param message Message to format and send to target.
  */
 fun sendCongratsMessage(target: CommandSender, message: String)
@@ -30,4 +30,4 @@ fun sendCongratsMessage(target: CommandSender, message: String)
  * @return A new component with the plugin prefix appended.
  */
 fun prefixedMessage(message: Component)
-        = Component.text("${RelicsPlugin.PLUGIN_MESSAGE_PREFIX}: ", NamedTextColor.GOLD).append(message)
+    = Component.text("${RelicsPlugin.PLUGIN_MESSAGE_PREFIX}: ", NamedTextColor.GOLD).append(message)
