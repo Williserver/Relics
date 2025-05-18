@@ -3,6 +3,7 @@ package net.williserver.relics
 import net.williserver.relics.commands.RelicsCommand
 import net.williserver.relics.commands.RelicsTabCompleter
 import net.williserver.relics.model.RelicSet
+import net.williserver.relics.session.RelicEventBus
 import org.bukkit.plugin.java.JavaPlugin
 
 /**
@@ -16,7 +17,7 @@ class RelicsPlugin: JavaPlugin() {
     override fun onEnable() {
         logger.info("Relics plugin enabled!")
 
-        getCommand("relics")!!.setExecutor(RelicsCommand(RelicSet()))
+        getCommand("relics")!!.setExecutor(RelicsCommand(RelicSet(), RelicEventBus()))
         getCommand("relics")!!.tabCompleter = RelicsTabCompleter()
     }
 

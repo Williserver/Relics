@@ -3,6 +3,7 @@ package net.williserver.relics.commands
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.williserver.relics.model.RelicSet
+import net.williserver.relics.session.RelicEventBus
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
@@ -13,9 +14,10 @@ import org.bukkit.entity.Player
  * It provides functionality to manage and execute operations associated with relic-related actions.
  *
  * @param relicSet Set of relics for this session.
+ * @param bus Event bus for relic lifecycle events.
  * @author Willmo3
  */
-class RelicsCommand(private val relicSet: RelicSet): CommandExecutor {
+class RelicsCommand(private val relicSet: RelicSet, private val bus: RelicEventBus): CommandExecutor {
 
     /**
      * Handles the execution of a command related to relics.
@@ -77,7 +79,6 @@ private class RelicSubcommandExecutor(
         return true
     }
 
-
     /**
      * Validates the command sender, ensures they are holding a single item, and checks if the item's name is valid.
      *
@@ -88,19 +89,25 @@ private class RelicSubcommandExecutor(
      *
      * Each validation step sends an error message to the sender if the check fails.
      *
-     * @return Whether all validations pass.
+     * @return Whether the command was invoked with the correct number of arguments.
      */
     fun register(): Boolean {
+        // Argument structure validation. No args
+        if (args.isNotEmpty()) {
+            return false
+        }
+
+        // Argument semantics validation.
         if (!v.assertValidPlayer()
             || !v.assertSingleItemHeld()) {
             return true
         }
-
         val name = (s as Player).inventory.itemInMainHand.displayName().examinableName()
         if (!v.assertValidName(name) || !v.assertUniqueName(name, relicSet)) {
             return true
         }
 
+        // Perform operation.
         return true
     }
 
