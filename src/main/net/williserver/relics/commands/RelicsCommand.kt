@@ -124,7 +124,7 @@ private class RelicSubcommandExecutor(
         }
 
         // Fire event, informing listeners to perform operation.
-        bus.fireEvent(RelicEvent.REGISTER, Relic(name, RelicRarity.rarityFromName(args[0])!!), s.uniqueId)
+        bus.fireEvent(RelicEvent.REGISTER, Relic(name, RelicRarity.rarityFromName(args[0])!!), s.uniqueId, item)
         sendCongratsMessage(s, "Registered a new relic named \"$name\".")
         return true
     }

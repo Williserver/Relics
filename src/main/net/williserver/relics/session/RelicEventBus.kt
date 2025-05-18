@@ -1,6 +1,7 @@
 package net.williserver.relics.session
 
 import net.williserver.relics.model.Relic
+import org.bukkit.inventory.ItemStack
 import java.util.UUID
 
 /**
@@ -16,8 +17,9 @@ enum class RelicEvent {
  * Listener function registered to a specific event.
  * @param relic Relic impacted by command invocation
  * @param agent Player who caused the event.
+ * @param item Item stack associated with the event, if applicable.
  */
-typealias RelicLifecycleListener = (relic: Relic, agent: UUID) -> Unit
+typealias RelicLifecycleListener = (relic: Relic, agent: UUID, item: ItemStack?) -> Unit
 
 /**
  * Event bus for major events in a relic's lifecycle.
@@ -45,6 +47,7 @@ class RelicEventBus {
      * @param event The relic lifecycle event to be triggered.
      * @param relic The relic associated with the event.
      * @param agent The UUID of the agent or entity responsible for the event.
+     * @param item The item stack associated with the event, if applicable.
      */
-    fun fireEvent(event: RelicEvent, relic: Relic, agent: UUID) = listeners[event]!!.forEach { it(relic, agent) }
+    fun fireEvent(event: RelicEvent, relic: Relic, agent: UUID, item: ItemStack? = null) = listeners[event]!!.forEach { it(relic, agent, item) }
 }

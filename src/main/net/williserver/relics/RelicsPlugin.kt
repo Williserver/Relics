@@ -2,6 +2,7 @@ package net.williserver.relics
 
 import net.williserver.relics.commands.RelicsCommand
 import net.williserver.relics.commands.RelicsTabCompleter
+import net.williserver.relics.integration.item.registerRelicItemStackListener
 import net.williserver.relics.model.RelicSet
 import net.williserver.relics.session.RelicEvent
 import net.williserver.relics.session.RelicEventBus
@@ -28,7 +29,10 @@ class RelicsPlugin: JavaPlugin() {
 
         /* Register relic lifecycle listeners. */
         val eventBus = RelicEventBus()
+        /* Core model listeners. */
         eventBus.registerListener(RelicEvent.REGISTER, relicSet.constructRegisterListener())
+        /* Integration listeners. */
+        eventBus.registerListener(RelicEvent.REGISTER, registerRelicItemStackListener())
         logger.info("Finished registering relic lifecycle listeners.")
 
         /* Register commands.*/
