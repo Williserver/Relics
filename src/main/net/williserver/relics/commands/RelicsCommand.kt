@@ -1,8 +1,12 @@
 package net.williserver.relics.commands
 
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.NamedTextColor
+import net.williserver.relics.model.Relic
+import net.williserver.relics.model.RelicRarity
 import net.williserver.relics.model.RelicSet
+import net.williserver.relics.session.RelicEvent
 import net.williserver.relics.session.RelicEventBus
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
@@ -35,14 +39,14 @@ class RelicsCommand(private val relicSet: RelicSet, private val bus: RelicEventB
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>) =
         if (args.isNotEmpty()) {
             val subcommand = args[0]
-            val execute = RelicSubcommandExecutor(sender, args.drop(1), relicSet)
+            val execute = RelicSubcommandExecutor(sender, args.drop(1), relicSet, bus)
 
             when (subcommand) {
                 "help" -> execute.help()
                 "register" -> execute.register()
                 else -> false
             }
-        } else RelicSubcommandExecutor(sender, args.toList(), relicSet).help()
+        } else RelicSubcommandExecutor(sender, args.toList(), relicSet, bus).help()
 
 /**
  * Handles the execution of subcommands related to relics.
@@ -58,7 +62,8 @@ class RelicsCommand(private val relicSet: RelicSet, private val bus: RelicEventB
 private class RelicSubcommandExecutor(
     private val s: CommandSender,
     private val args: List<String>,
-    private val relicSet: RelicSet
+    private val relicSet: RelicSet,
+    private val bus: RelicEventBus,
 ) {
     // Create a validator for this sender.
     private val v = RelicsCommandValidator(s)
@@ -102,12 +107,23 @@ private class RelicSubcommandExecutor(
             || !v.assertSingleItemHeld()) {
             return true
         }
-        val name = (s as Player).inventory.itemInMainHand.displayName().examinableName()
+
+        val item = (s as Player).inventory.itemInMainHand
+        val name =
+            if (item.hasItemMeta() && item.itemMeta!!.hasDisplayName()) {
+                // Since we're registering relic under plaintext display name, acceptable to use this.
+                (item.itemMeta!!.displayName() as TextComponent).content()
+            } else {
+                item.type.name.lowercase().replace('_', ' ')
+            }
+
         if (!v.assertValidName(name) || !v.assertUniqueName(name, relicSet)) {
             return true
         }
 
-        // Perform operation.
+        // Fire event, informing listeners to perform operation.
+        // TODO: accept rarity as an argument.
+        bus.fireEvent(RelicEvent.REGISTER, Relic(name, RelicRarity.Common), s.uniqueId)
         return true
     }
 
