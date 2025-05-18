@@ -12,6 +12,7 @@ import org.bukkit.persistence.PersistentDataType
 import org.bukkit.plugin.Plugin
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
+import org.bukkit.event.entity.ItemSpawnEvent
 
 /**
  * Integrates relic-specific behavior within an ItemStack by registering appropriate event listeners.
@@ -61,7 +62,7 @@ class RelicItemStackIntegrator(instance: Plugin,
              * Listens for entity despawn events which may refer to a Relic. If a relic is affected, fire event.
              */
             @EventHandler
-            fun onItemDespawnEvent(event: org.bukkit.event.entity.ItemSpawnEvent) = purgeIfRelic(event.entity)
+            fun onItemDespawnEvent(event: ItemSpawnEvent) = purgeIfRelic(event.entity)
 
             /**
              * Checks if the given entity is a relic and processes its destruction if applicable.
