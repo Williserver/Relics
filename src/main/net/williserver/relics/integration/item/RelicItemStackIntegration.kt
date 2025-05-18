@@ -1,9 +1,11 @@
 package net.williserver.relics.integration.item
 
+import net.kyori.adventure.text.Component
 import net.williserver.relics.model.RelicSet
 import net.williserver.relics.session.RelicEvent
 import net.williserver.relics.session.RelicEventBus
 import net.williserver.relics.session.RelicLifecycleListener
+import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Entity
 import org.bukkit.entity.Item
@@ -12,7 +14,10 @@ import org.bukkit.persistence.PersistentDataType
 import org.bukkit.plugin.Plugin
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
+import org.bukkit.event.entity.ItemDespawnEvent
 import org.bukkit.event.entity.ItemSpawnEvent
+import org.bukkit.event.player.PlayerItemBreakEvent
+import org.bukkit.inventory.ItemStack
 
 /**
  * Integrates relic-specific behavior within an ItemStack by registering appropriate event listeners.
@@ -56,29 +61,38 @@ class RelicItemStackIntegrator(instance: Plugin,
              * is a relic item. If so, it must have been destroyed and the destroy event is triggered.
              */
             @EventHandler
-            fun onDestroyEvent(event: EntityDamageEvent) = purgeIfRelic(event.entity)
+            fun onDestroyEvent(event: EntityDamageEvent) {
+                if (event.entity is Item) {
+                    purgeIfRelic((event.entity as Item).itemStack)
+                }
+            }
 
             /**
              * Listens for entity despawn events which may refer to a Relic. If a relic is affected, fire event.
              */
             @EventHandler
-            fun onItemDespawnEvent(event: ItemSpawnEvent) = purgeIfRelic(event.entity)
+            fun onItemDespawnEvent(event: ItemDespawnEvent) = purgeIfRelic(event.entity.itemStack)
 
             /**
-             * Checks if the given entity is a relic and processes its destruction if applicable.
-             * @param entity The entity to be checked and potentially processed as a relic.
+             * Handles the event where a player breaks an item. If the broken item is a relic, it will be processed.
+             *
+             * TODO: see if a veinmining plugin respects destroy.
              */
-            fun purgeIfRelic(entity: Entity) {
-                if (entity !is Item) {
-                    return // The entity was not an item
-                }
+            @EventHandler
+            fun onPlayerDestroyItem(event: PlayerItemBreakEvent) = purgeIfRelic(event.brokenItem)
 
-                if (!entity.itemStack.hasItemMeta()) {
+            /**
+             * Checks if the provided item is recognized as a relic and destroys if so.
+             * @param item The item stack to be checked and processed as a relic.
+             */
+            fun purgeIfRelic(item: ItemStack) {
+                Bukkit.broadcast(Component.text("Event fired!"))
+
+                if (!item.hasItemMeta()) {
                     return // The item was not a relic
                 }
-                val itemMeta = entity.itemStack.itemMeta
 
-                val relicName = itemMeta.persistentDataContainer.get(relicKey, PersistentDataType.STRING)
+                val relicName = item.itemMeta.persistentDataContainer.get(relicKey, PersistentDataType.STRING)
                     ?: return // The item was not a relic
                 val relic = relicSet.relicNamed(relicName)
                     ?: return // The item is no longer registered as a relic -- this may happen if the listener fires multiple times for the same item.
