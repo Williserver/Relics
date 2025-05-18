@@ -33,9 +33,9 @@ class RelicsTabCompleter: TabCompleter {
 
         // Subcommand suggestions
         when (args.size) {
-            1 -> {
-                completions.add("help")
-                completions.add("register")
+            1 -> completions.addAll(setOf("help", "register"))
+            2 -> when (args[0].lowercase()) {
+                "register" -> completions.addAll(setOf("common", "rare", "epic", "legendary", "unique"))
             }
         }
 

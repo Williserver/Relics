@@ -11,7 +11,25 @@ enum class RelicRarity() {
     Rare,
     Epic,
     Legendary,
-    Unique
+    Unique;
+
+    companion object {
+        /**
+         * Returns the corresponding `RelicRarity` enum value based on the given name. The match
+         * is case-insensitive. If the name does not match any predefined rarity, `null` is returned.
+         *
+         * @param name The name of the rarity to be translated into a `RelicRarity` enum value.
+         * @return The corresponding `RelicRarity` or `null` if no match is found.
+         */
+        fun rarityFromName(name: String) = when (name.lowercase()) {
+            "common" -> Common
+            "rare" -> Rare
+            "epic" -> Epic
+            "legendary" -> Legendary
+            "unique" -> Unique
+            else -> null
+        }
+    }
 }
 
 /**

@@ -80,7 +80,8 @@ private class RelicSubcommandExecutor(
             = bullet.append(Component.text("$name: ", NamedTextColor.RED).append(Component.text(text, NamedTextColor.GRAY)))
 
         val help = generateCommandHelp("help", "pull up this help menu")
-        s.sendMessage(header.append(help))
+        val register = generateCommandHelp("register [name]", "register the item that you're holding as a Relic.")
+        s.sendMessage(header.append(help).append(register))
         return true
     }
 
@@ -98,13 +99,14 @@ private class RelicSubcommandExecutor(
      */
     fun register(): Boolean {
         // Argument structure validation. No args
-        if (args.isNotEmpty()) {
+        if (args.size != 1) {
             return false
         }
 
         // Argument semantics validation.
         if (!v.assertValidPlayer()
-            || !v.assertSingleItemHeld()) {
+            || !v.assertSingleItemHeld()
+            || !v.assertRarityValid(args[0])) {
             return true
         }
 
@@ -123,7 +125,7 @@ private class RelicSubcommandExecutor(
 
         // Fire event, informing listeners to perform operation.
         // TODO: accept rarity as an argument.
-        bus.fireEvent(RelicEvent.REGISTER, Relic(name, RelicRarity.Common), s.uniqueId)
+        bus.fireEvent(RelicEvent.REGISTER, Relic(name, RelicRarity.rarityFromName(args[0])!!), s.uniqueId)
         return true
     }
 

@@ -1,6 +1,7 @@
 package net.williserver.relics.commands
 
 import net.williserver.relics.model.Relic
+import net.williserver.relics.model.RelicRarity
 import net.williserver.relics.model.RelicSet
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -40,7 +41,7 @@ class RelicsCommandValidator(private val s: CommandSender) {
         } else true
 
     /**
-     * Assert that the name provided is valid.
+     * Assert that the name provided is valid. If not, message sender a warning.
      * @param name Name to check for validity.
      * @return whether the name is valid
      */
@@ -51,14 +52,29 @@ class RelicsCommandValidator(private val s: CommandSender) {
         } else true
 
     /**
-     * Assert that the name provided is unique among the relics in the provided set.
-     * @param name Name to check for uniqueness.
-     * @param otherRelics Set of relics to check against.
-     * @return Whether the name is unique.
+     * Asserts that the provided name is unique among the existing relics in the given relic set.
+     * If a relic with the same name already exists, an error message will be sent.
+     *
+     * @param name The name of the relic to validate for uniqueness.
+     * @param otherRelics The set of relics to check against for name uniqueness.
+     * @return whether the name is unique.
      */
     fun assertUniqueName(name: String, otherRelics: RelicSet) =
         if (otherRelics.relicNamed(name) != null) {
             sendErrorMessage(s, "There is already a relic named \"$name\".")
+            false
+        } else true
+
+    /**
+     * Asserts that the provided rarity name is valid. If the rarity name is invalid,
+     * it sends an error message indicating the valid options.
+     *
+     * @param rarityName The name of the rarity to validate.
+     * @return `true` if the provided rarity name is valid, otherwise `false`.
+     */
+    fun assertRarityValid(rarityName: String) =
+        if (RelicRarity.rarityFromName(rarityName) == null) {
+            sendErrorMessage(s, "Invalid rarity: $rarityName. Choose common, rare, epic, legendary, or unique.")
             false
         } else true
 }
