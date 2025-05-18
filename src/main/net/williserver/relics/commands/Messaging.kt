@@ -12,7 +12,16 @@ import org.bukkit.command.CommandSender
  * @param message Error to format and send to target.
  */
 fun sendErrorMessage(target: CommandSender, message: String)
-        = target.sendMessage(prefixedMessage(Component.text(message, NamedTextColor.RED)))
+    = target.sendMessage(prefixedMessage(Component.text(message, NamedTextColor.RED)))
+
+/**
+ * Send a green colored congratulatory message to a target.
+ *
+ * @param target Entity to recieve message.
+ * @param message Message to format and send to target.
+ */
+fun sendCongratsMessage(target: CommandSender, message: String)
+    = target.sendMessage(prefixedMessage(Component.text(message, NamedTextColor.GREEN)))
 
 /**
  * Append a message prefix component onto a message component.

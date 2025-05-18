@@ -124,8 +124,8 @@ private class RelicSubcommandExecutor(
         }
 
         // Fire event, informing listeners to perform operation.
-        // TODO: accept rarity as an argument.
         bus.fireEvent(RelicEvent.REGISTER, Relic(name, RelicRarity.rarityFromName(args[0])!!), s.uniqueId)
+        sendCongratsMessage(s, "Registered a new relic named \"$name\".")
         return true
     }
 
