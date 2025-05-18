@@ -16,8 +16,9 @@ class RelicTest {
      * when the name is empty.
      */
     @Test
-    fun testRelicEmptyName() {
-        Relic("T", RelicRarity.Rare)
+    fun testRelicName() {
+        Relic("T's bottle-o_wine", RelicRarity.Rare)
         assertThrows(IllegalArgumentException::class.java) { Relic("", RelicRarity.Rare) }
+        assertThrows(IllegalArgumentException::class.java) { Relic(" Leading whitespace!", RelicRarity.Rare) }
     }
 }
