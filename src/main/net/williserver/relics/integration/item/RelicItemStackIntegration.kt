@@ -17,6 +17,7 @@ import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.ItemDespawnEvent
 import org.bukkit.event.entity.ItemSpawnEvent
 import org.bukkit.event.inventory.FurnaceBurnEvent
+import org.bukkit.event.inventory.FurnaceSmeltEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.inventory.ItemStack
@@ -66,7 +67,6 @@ class RelicItemStackIntegrator(instance: Plugin,
     fun constructRelicRemoveListener(): Listener =
         object: Listener {
             // TODO: compost event
-            // TODO: furnace burn event
             // TODO: use water
 
             /**
@@ -79,6 +79,9 @@ class RelicItemStackIntegrator(instance: Plugin,
                     purgeIfRelic((event.entity as Item).itemStack)
                 }
             }
+
+            @EventHandler
+            fun onFurnaceSmeltEvent(event: FurnaceSmeltEvent) = purgeIfRelic(event.source)
 
             @EventHandler
             fun onFurnaceBurnEvent(event: FurnaceBurnEvent) = purgeIfRelic(event.fuel)
