@@ -1,5 +1,6 @@
 package net.williserver.relics.integration.item
 
+import io.papermc.paper.event.block.CompostItemEvent
 import net.kyori.adventure.text.Component
 import net.williserver.relics.model.RelicSet
 import net.williserver.relics.session.RelicEvent
@@ -66,8 +67,11 @@ class RelicItemStackIntegrator(instance: Plugin,
      */
     fun constructRelicRemoveListener(): Listener =
         object: Listener {
-            // TODO: compost event
             // TODO: use water
+
+            /*
+             * Listeners for various ways of destroying an item.
+             */
 
             /**
              * Listens for entity damage events and determines if the entity affected by the event
@@ -93,7 +97,14 @@ class RelicItemStackIntegrator(instance: Plugin,
             fun onPlayerConsumeItem(event: PlayerItemConsumeEvent) = purgeIfRelic(event.item)
 
             @EventHandler
+            fun onCompostItemEvent(event: CompostItemEvent) = purgeIfRelic(event.item)
+
+            @EventHandler
             fun onPlayerDestroyItem(event: PlayerItemBreakEvent) = purgeIfRelic(event.brokenItem)
+
+            /*
+             * Internal helpers
+             */
 
             /**
              * Checks if the provided item is recognized as a relic and destroys if so.
