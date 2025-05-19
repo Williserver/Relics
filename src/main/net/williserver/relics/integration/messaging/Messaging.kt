@@ -1,8 +1,9 @@
-package net.williserver.relics.commands
+package net.williserver.relics.integration.messaging
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.williserver.relics.RelicsPlugin
+import org.bukkit.Bukkit.broadcast
 import org.bukkit.command.CommandSender
 
 /**
@@ -31,3 +32,11 @@ fun sendCongratsMessage(target: CommandSender, message: String)
  */
 fun prefixedMessage(message: Component)
     = Component.text("${RelicsPlugin.PLUGIN_MESSAGE_PREFIX}: ", NamedTextColor.GOLD).append(message)
+
+/**
+ * Broadcast a string message. Color will be purple.
+ *
+ * @param message Message to format and broadcast.
+ */
+fun broadcastPrefixedMessage(message: String)
+        = broadcast(prefixedMessage(Component.text(message, NamedTextColor.DARK_PURPLE)))

@@ -5,6 +5,8 @@ import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.NamedTextColor
 import net.williserver.relics.RelicsPlugin.Companion.PLUGIN_MESSAGE_PREFIX
 import net.williserver.relics.integration.item.RelicItemStackIntegrator
+import net.williserver.relics.integration.messaging.prefixedMessage
+import net.williserver.relics.integration.messaging.sendCongratsMessage
 import net.williserver.relics.model.Relic
 import net.williserver.relics.model.RelicRarity
 import net.williserver.relics.model.RelicSet
@@ -109,6 +111,7 @@ private class RelicSubcommandExecutor(
      * @return Whether the command was invoked with the correct number of arguments.
      */
     fun register(): Boolean {
+        // TODO: permissions check
         // Argument structure validation. One arg: item rarity.
         if (args.size != 1) {
             return false

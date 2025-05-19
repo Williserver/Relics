@@ -17,10 +17,12 @@ enum class RelicEvent {
  * Type of side effect listener imposes, ordered from most to least destructive.
  * - Model: affects underlying data model. Will be fired first.
  * - Integration: affects integration with other plugins or vanilla features. Will be fired second.
+ * - Messaging: inform users about events in relic lifecycle. Purely cosmetic, will be fired last.
  */
 enum class RelicListenerType {
     MODEL,
     INTEGRATION,
+    MESSAGING,
 }
 
 /**

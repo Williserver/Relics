@@ -3,6 +3,7 @@ package net.williserver.relics
 import net.williserver.relics.commands.RelicsCommand
 import net.williserver.relics.commands.RelicsTabCompleter
 import net.williserver.relics.integration.item.RelicItemStackIntegrator
+import net.williserver.relics.integration.messaging.constructRelicDestroyMessageListener
 import net.williserver.relics.model.RelicSet
 import net.williserver.relics.session.RelicEvent
 import net.williserver.relics.session.RelicEventBus
@@ -39,14 +40,17 @@ class RelicsPlugin: JavaPlugin() {
 
         /* Register relic lifecycle listeners. */
         val eventBus = RelicEventBus()
+
         /* Core model listeners. */
         eventBus.registerListener(RelicEvent.REGISTER, RelicListenerType.MODEL, relicSet.constructRegisterListener())
         eventBus.registerListener(RelicEvent.DESTROY, RelicListenerType.MODEL, relicSet.constructDestroyListener())
-        // TODO: messaging tier.
-        // TODO: messaging listeners.
+
         /* Integration listeners. */
         val integrator = RelicItemStackIntegrator(this, relicSet, eventBus)
         eventBus.registerListener(RelicEvent.REGISTER, RelicListenerType.INTEGRATION, integrator.constructRegisterItemStackListener())
+
+        /* Messaging listeners. */
+        eventBus.registerListener(RelicEvent.DESTROY, RelicListenerType.MESSAGING, constructRelicDestroyMessageListener())
         logger.info("Finished registering relic lifecycle listeners.")
 
         /* Register in-game event listeners. */

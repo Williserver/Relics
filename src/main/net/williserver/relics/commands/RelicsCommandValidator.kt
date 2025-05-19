@@ -1,6 +1,7 @@
 package net.williserver.relics.commands
 
 import net.williserver.relics.integration.item.RelicItemStackIntegrator
+import net.williserver.relics.integration.messaging.sendErrorMessage
 import net.williserver.relics.model.Relic
 import net.williserver.relics.model.RelicRarity
 import net.williserver.relics.model.RelicSet
