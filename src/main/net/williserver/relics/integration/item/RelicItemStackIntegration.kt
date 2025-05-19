@@ -17,8 +17,11 @@ import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.ItemDespawnEvent
 import org.bukkit.event.entity.ItemSpawnEvent
+import org.bukkit.event.inventory.BrewEvent
+import org.bukkit.event.inventory.BrewingStandFuelEvent
 import org.bukkit.event.inventory.FurnaceBurnEvent
 import org.bukkit.event.inventory.FurnaceSmeltEvent
+import org.bukkit.event.player.PlayerBucketFillEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.inventory.ItemStack
@@ -84,20 +87,36 @@ class RelicItemStackIntegrator(instance: Plugin,
                 }
             }
 
-            @EventHandler
-            fun onFurnaceSmeltEvent(event: FurnaceSmeltEvent) = purgeIfRelic(event.source)
+            // TODO: on potion throw -- including bottle 'o enchanting
+            // TODO: on enchant
+            // TODO: potion material on top of brewing stand.
 
             @EventHandler
-            fun onFurnaceBurnEvent(event: FurnaceBurnEvent) = purgeIfRelic(event.fuel)
+            fun onBrewingStandFuel(event: BrewingStandFuelEvent) = purgeIfRelic(event.fuel)
 
             @EventHandler
-            fun onItemDespawnEvent(event: ItemDespawnEvent) = purgeIfRelic(event.entity.itemStack)
+            // Purge all relic bottles.
+            fun onPotionCreate(event: BrewEvent) = event.contents.forEach {
+                // Be advised -- it may sometimes be null, EVEN IF SPIGOT CLAIMS THIS IS NOT THE CASE!
+                if (it != null) {
+                    purgeIfRelic(it)
+                }
+            }
+
+            @EventHandler
+            fun onFurnaceSmelt(event: FurnaceSmeltEvent) = purgeIfRelic(event.source)
+
+            @EventHandler
+            fun onFurnaceBurn(event: FurnaceBurnEvent) = purgeIfRelic(event.fuel)
+
+            @EventHandler
+            fun onItemDespawn(event: ItemDespawnEvent) = purgeIfRelic(event.entity.itemStack)
 
             @EventHandler
             fun onPlayerConsumeItem(event: PlayerItemConsumeEvent) = purgeIfRelic(event.item)
 
             @EventHandler
-            fun onCompostItemEvent(event: CompostItemEvent) = purgeIfRelic(event.item)
+            fun onCompostItem(event: CompostItemEvent) = purgeIfRelic(event.item)
 
             @EventHandler
             fun onPlayerDestroyItem(event: PlayerItemBreakEvent) = purgeIfRelic(event.brokenItem)
