@@ -56,6 +56,11 @@ class RelicItemStackIntegrator(instance: Plugin,
      */
     fun constructRelicRemoveListener(): Listener =
         object: Listener {
+
+            // TODO: consume event
+            // TODO: compost event
+            // TODO: furnace burn event
+
             /**
              * Listens for entity damage events and determines if the entity affected by the event
              * is a relic item. If so, it must have been destroyed and the destroy event is triggered.
@@ -75,8 +80,6 @@ class RelicItemStackIntegrator(instance: Plugin,
 
             /**
              * Handles the event where a player breaks an item. If the broken item is a relic, it will be processed.
-             *
-             * TODO: see if a veinmining plugin respects destroy.
              */
             @EventHandler
             fun onPlayerDestroyItem(event: PlayerItemBreakEvent) = purgeIfRelic(event.brokenItem)

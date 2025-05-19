@@ -47,11 +47,11 @@ class RelicsCommandValidator(private val s: CommandSender) {
      * @return whether the sender is holding a non-stackable item.
      * @throws IllegalArgumentException if the sender is not a player.
      */
-    fun assertItemNonStackable() =
+    fun assertValidMaterial() =
         if (s !is Player) {
             throw IllegalArgumentException("This function should only be run by players -- this should have been checked earlier!")
-        } else if (s.inventory.itemInMainHand.maxStackSize != 1) {
-            sendErrorMessage(s, "Only non-stackable items can be registered as relics.")
+        } else if (!Relic.validMaterial(s.inventory.itemInMainHand.type)) {
+            sendErrorMessage(s, "This item cannot be registered as a relic.")
             false
         } else true
 

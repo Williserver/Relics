@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.NamedTextColor.*
+import org.bukkit.Material
 
 /**
  * Relics are associated with a rarity.
@@ -63,5 +64,15 @@ data class Relic(val name: String, val rarity: RelicRarity) {
          * After that, the relic name may contain any letter or digit. It may also contain apostrophes, underscores, dashes, and spaces.
          */
         fun validName(name: String) =  name.matches("^([a-zA-Z0-9]|-|_|')([a-zA-Z0-9]|-|_|'|\\s)*$".toRegex())
+
+        /**
+         * Validates whether the provided material is a valid type.
+         * A material is considered valid if it is not air and not a block.
+         *
+         * @param material The material to validate.
+         * @return Whether the material is valid
+         */
+        fun validMaterial(material: Material) =
+            !material.isAir && !material.isBlock
     }
 }

@@ -109,7 +109,7 @@ private class RelicSubcommandExecutor(
         // Argument semantics validation.
         if (!v.assertValidPlayer()
             || !v.assertSingleItemHeld()
-            || !v.assertItemNonStackable()
+            || !v.assertValidMaterial()
             || !v.assertRarityValid(args[0])) {
             return true
         }
@@ -152,7 +152,7 @@ private class RelicSubcommandExecutor(
     }
 
     /**
-     * Formats the ownership information of a relic, if the relic has an associated owner.
+     * Formats the ownership information of a relic if the relic has an associated owner.
      *
      * @param relic The relic for which ownership information is to be formatted. Must be a registered relic.
      * @return A `TextComponent` containing the ownership information, or null if the relic has no owner.
