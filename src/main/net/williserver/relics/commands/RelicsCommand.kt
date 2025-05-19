@@ -3,11 +3,13 @@ package net.williserver.relics.commands
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.NamedTextColor
+import net.williserver.relics.RelicsPlugin.Companion.PLUGIN_MESSAGE_PREFIX
 import net.williserver.relics.model.Relic
 import net.williserver.relics.model.RelicRarity
 import net.williserver.relics.model.RelicSet
 import net.williserver.relics.session.RelicEvent
 import net.williserver.relics.session.RelicEventBus
+import org.bukkit.Bukkit
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
@@ -44,6 +46,7 @@ class RelicsCommand(private val relicSet: RelicSet, private val bus: RelicEventB
             when (subcommand) {
                 "help" -> execute.help()
                 "register" -> execute.register()
+                "list" -> execute.list()
                 else -> false
             }
         } else RelicSubcommandExecutor(sender, args.toList(), relicSet, bus).help()
@@ -129,19 +132,38 @@ private class RelicSubcommandExecutor(
         return true
     }
 
-    // TODO: register relic
-    // -- given an item in your hand, add its relic name as an NBT tag.
-    // -- add its name to the relic list.
+    /**
+     * Sends a message to the command sender containing a formatted list of all relics.
+     *
+     * @return `true` after successfully sending the list message.
+     */
+    fun list(): Boolean {
+        var message = Component.text("$PLUGIN_MESSAGE_PREFIX All Relics: ", NamedTextColor.GOLD)
 
-    // Validate:
-    // -- Sender is player
-    // -- Exactly one item in hand. (i.e. itemstack size 1)
-    // -- Name is valid -- i.e. nonempty, nothing dangerous for serialization
-    // TODO: VALIDNAME
+        fun relicEntry(relic: Relic)
+            = Component.text("\n - ", NamedTextColor.RED)
+            .append(relic.asDisplayComponent())
+            .append(formatOwner(relic) ?: Component.text(" (unclaimed)", NamedTextColor.GRAY))
 
-    // Remove the item from their inventory
-    // Add a copy of the item with added metadata
-    // Place in the list
+        relicSet.relics().forEach { message = message.append(relicEntry(it)) }
+        s.sendMessage(message)
+        return true
+    }
+
+    /**
+     * Formats the ownership information of a relic, if the relic has an associated owner.
+     *
+     * @param relic The relic for which ownership information is to be formatted. Must be a registered relic.
+     * @return A `TextComponent` containing the ownership information, or null if the relic has no owner.
+     */
+    private fun formatOwner(relic: Relic): TextComponent? =
+        relicSet.ownerOf(relic)?.let {
+            val name = Bukkit.getOfflinePlayer(it).name ?: it.toString()
+
+            Component.text(" (owned by ", NamedTextColor.GRAY)
+                .append(Component.text(name, NamedTextColor.YELLOW))
+                .append(Component.text(")", NamedTextColor.GRAY))
+        }
 
     // TODO: relic info
     // -- given an item in your hand, check if it is a relic.
@@ -162,9 +184,6 @@ private class RelicSubcommandExecutor(
 
     // Report:
     // -- Whether you claimed the relic or not.
-
-    // TODO: list relics
-    // -- report a list of all relics on the server to sender.
 
     // TODO: top players
     // -- report a list of players, sorted by the value of the relics they own.

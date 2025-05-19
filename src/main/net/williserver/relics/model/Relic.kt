@@ -1,17 +1,20 @@
 package net.williserver.relics.model
 
 import kotlinx.serialization.Serializable
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.NamedTextColor.*
 
 /**
  * Relics are associated with a rarity.
  */
 @Serializable
-enum class RelicRarity() {
-    Common,
-    Rare,
-    Epic,
-    Legendary,
-    Unique;
+enum class RelicRarity(val color: NamedTextColor) {
+    Common(GRAY),
+    Rare(GREEN),
+    Epic(DARK_PURPLE),
+    Legendary(GOLD),
+    Unique(DARK_RED);
 
     companion object {
         /**
@@ -46,6 +49,11 @@ data class Relic(val name: String, val rarity: RelicRarity) {
             throw IllegalArgumentException("Invalid relic name: $name. Please validate with validName function.")
         }
     }
+
+    /**
+     * @return a Component representing the textual display of the relic, including its rarity and name.
+     */
+    fun asDisplayComponent() = Component.text("${rarity.name} $name", rarity.color)
 
     companion object {
         /**
