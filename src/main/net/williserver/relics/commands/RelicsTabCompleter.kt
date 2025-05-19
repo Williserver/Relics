@@ -33,9 +33,15 @@ class RelicsTabCompleter: TabCompleter {
 
         // Subcommand suggestions
         when (args.size) {
-            1 -> completions.addAll(setOf("help", "list", "register"))
-            2 -> when (args[0].lowercase()) {
-                "register" -> completions.addAll(setOf("common", "rare", "epic", "legendary", "unique"))
+            1 -> {
+                completions.addAll(setOf("help", "list", "register"))
+                completions.removeAll{ !it.startsWith(args[0], ignoreCase = true) }
+            }
+            2 -> {
+                when (args[0].lowercase()) {
+                    "register" -> completions.addAll(setOf("common", "rare", "epic", "legendary", "unique"))
+                }
+                completions.removeAll{ !it.startsWith(args[1], ignoreCase = true) }
             }
         }
 
