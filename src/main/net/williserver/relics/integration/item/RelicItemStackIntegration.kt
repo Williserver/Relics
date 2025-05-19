@@ -17,6 +17,7 @@ import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.ItemDespawnEvent
 import org.bukkit.event.entity.ItemSpawnEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
+import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.inventory.ItemStack
 
 /**
@@ -63,10 +64,9 @@ class RelicItemStackIntegrator(instance: Plugin,
      */
     fun constructRelicRemoveListener(): Listener =
         object: Listener {
-
-            // TODO: consume event
             // TODO: compost event
             // TODO: furnace burn event
+            // TODO: use water
 
             /**
              * Listens for entity damage events and determines if the entity affected by the event
@@ -79,15 +79,12 @@ class RelicItemStackIntegrator(instance: Plugin,
                 }
             }
 
-            /**
-             * Listens for entity despawn events which may refer to a Relic. If a relic is affected, fire event.
-             */
             @EventHandler
             fun onItemDespawnEvent(event: ItemDespawnEvent) = purgeIfRelic(event.entity.itemStack)
 
-            /**
-             * Handles the event where a player breaks an item. If the broken item is a relic, it will be processed.
-             */
+            @EventHandler
+            fun onPlayerConsumeItem(event: PlayerItemConsumeEvent) = purgeIfRelic(event.item)
+
             @EventHandler
             fun onPlayerDestroyItem(event: PlayerItemBreakEvent) = purgeIfRelic(event.brokenItem)
 
