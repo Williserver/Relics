@@ -118,7 +118,7 @@ private class RelicSubcommandExecutor(
         val name =
             if (item.hasItemMeta() && item.itemMeta!!.hasDisplayName()) {
                 // Since we're registering relic under plaintext display name, acceptable to use this.
-                (item.itemMeta!!.displayName() as TextComponent).content()
+                item.itemMeta!!.displayName
             } else {
                 item.type.name.lowercase().replace('_', ' ')
             }
