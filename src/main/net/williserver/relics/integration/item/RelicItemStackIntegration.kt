@@ -27,6 +27,7 @@ import org.bukkit.inventory.ItemStack
  * @param instance The plugin instance used for constructing unique namespaced keys for relic metadata.
  * @param relicSet The collection of registered relics and their ownership details.
  * @param bus The event bus used to fire and handle custom relic-related events.
+ * @author Willmo3
  */
 class RelicItemStackIntegrator(instance: Plugin,
                                private val relicSet: RelicSet,
@@ -50,6 +51,12 @@ class RelicItemStackIntegrator(instance: Plugin,
             it.persistentDataContainer.set(relicKey, PersistentDataType.STRING, relic.name)
         }
     }
+
+    /***
+     * @param item The item stack to be checked for relic status.
+     * @return Whether the itemstack has relic metadata.
+     */
+    fun isRelic(item: ItemStack) = item.itemMeta.persistentDataContainer.has(relicKey, PersistentDataType.STRING)
 
     /**
      * @return listener that listens for events related to the destruction of relic items.
@@ -104,6 +111,9 @@ class RelicItemStackIntegrator(instance: Plugin,
                 bus.fireEvent(RelicEvent.DESTROY, relic)
             }
         }
+
+    companion object {
+    }
 }
 
-// fun isRelic(item: ItemStack): Boolean = item.itemMeta?.persistentDataContainer?.has(NamespacedKey(relicNamespace, relicNameKey), PersistentDataType.STRING) ?: false
+//

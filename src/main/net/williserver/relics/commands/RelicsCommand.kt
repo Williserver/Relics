@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.NamedTextColor
 import net.williserver.relics.RelicsPlugin.Companion.PLUGIN_MESSAGE_PREFIX
+import net.williserver.relics.integration.item.RelicItemStackIntegrator
 import net.williserver.relics.model.Relic
 import net.williserver.relics.model.RelicRarity
 import net.williserver.relics.model.RelicSet
@@ -21,9 +22,13 @@ import org.bukkit.entity.Player
  *
  * @param relicSet Set of relics for this session.
  * @param bus Event bus for relic lifecycle events.
+ * @param itemIntegrator Tool for mapping ItemStacks -> Relics
  * @author Willmo3
  */
-class RelicsCommand(private val relicSet: RelicSet, private val bus: RelicEventBus): CommandExecutor {
+class RelicsCommand(
+    private val relicSet: RelicSet,
+    private val bus: RelicEventBus,
+    private val itemIntegrator: RelicItemStackIntegrator): CommandExecutor {
 
     /**
      * Handles the execution of a command related to relics.
@@ -41,7 +46,7 @@ class RelicsCommand(private val relicSet: RelicSet, private val bus: RelicEventB
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>) =
         if (args.isNotEmpty()) {
             val subcommand = args[0]
-            val execute = RelicSubcommandExecutor(sender, args.drop(1), relicSet, bus)
+            val execute = RelicSubcommandExecutor(sender, args.drop(1), relicSet, bus, itemIntegrator)
 
             when (subcommand) {
                 "help" -> execute.help()
@@ -49,7 +54,7 @@ class RelicsCommand(private val relicSet: RelicSet, private val bus: RelicEventB
                 "list" -> execute.list()
                 else -> false
             }
-        } else RelicSubcommandExecutor(sender, args.toList(), relicSet, bus).help()
+        } else RelicSubcommandExecutor(sender, args.toList(), relicSet, bus, itemIntegrator).help()
 
 /**
  * Handles the execution of subcommands related to relics.
@@ -61,15 +66,18 @@ class RelicsCommand(private val relicSet: RelicSet, private val bus: RelicEventB
  * @property s sender of the command, such as a player or console.
  * @property args list of arguments provided with the subcommand.
  * @property relicSet set of relics for the subcommand.
+ * @param bus Event bus for this session.
+ * @param itemIntegrator Tool for mapping itemStacks -> relics
  */
 private class RelicSubcommandExecutor(
     private val s: CommandSender,
     private val args: List<String>,
     private val relicSet: RelicSet,
     private val bus: RelicEventBus,
+    itemIntegrator: RelicItemStackIntegrator
 ) {
     // Create a validator for this sender.
-    private val v = RelicsCommandValidator(s)
+    private val v = RelicsCommandValidator(s, itemIntegrator)
 
     /**
      * Sends a help message to the command sender containing details about available commands.
@@ -109,7 +117,8 @@ private class RelicSubcommandExecutor(
         // Argument semantics validation.
         if (!v.assertValidPlayer()
             || !v.assertSingleItemHeld()
-            || !v.assertValidMaterial()
+            || !v.assertHeldItemValidMaterial()
+            || !v.assertHeldItemNotAlreadyRelic()
             || !v.assertRarityValid(args[0])) {
             return true
         }

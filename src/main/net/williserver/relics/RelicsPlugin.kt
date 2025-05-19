@@ -42,6 +42,8 @@ class RelicsPlugin: JavaPlugin() {
         /* Core model listeners. */
         eventBus.registerListener(RelicEvent.REGISTER, RelicListenerType.MODEL, relicSet.constructRegisterListener())
         eventBus.registerListener(RelicEvent.DESTROY, RelicListenerType.MODEL, relicSet.constructDestroyListener())
+        // TODO: messaging tier.
+        // TODO: messaging listeners.
         /* Integration listeners. */
         val integrator = RelicItemStackIntegrator(this, relicSet, eventBus)
         eventBus.registerListener(RelicEvent.REGISTER, RelicListenerType.INTEGRATION, integrator.constructRegisterItemStackListener())
@@ -51,7 +53,7 @@ class RelicsPlugin: JavaPlugin() {
         server.pluginManager.registerEvents(integrator.constructRelicRemoveListener(), this)
 
         /* Register commands.*/
-        getCommand("relics")!!.setExecutor(RelicsCommand(relicSet, eventBus))
+        getCommand("relics")!!.setExecutor(RelicsCommand(relicSet, eventBus, integrator))
         getCommand("relics")!!.tabCompleter = RelicsTabCompleter()
         logger.info("Finished registering commands.")
 

@@ -1,5 +1,6 @@
 package net.williserver.relics.commands
 
+import net.williserver.relics.integration.item.RelicItemStackIntegrator
 import net.williserver.relics.model.Relic
 import net.williserver.relics.model.RelicRarity
 import net.williserver.relics.model.RelicSet
@@ -11,8 +12,10 @@ import org.bukkit.entity.Player
  * Wrap around a sender.
  *
  * @param s Sender invoking command.
+ * @param itemIntegrator Utility for checking if an item is a relic.
  */
-class RelicsCommandValidator(private val s: CommandSender) {
+class RelicsCommandValidator(private val s: CommandSender,
+                             private val itemIntegrator: RelicItemStackIntegrator) {
     /**
      * Determine whether a command sender is a player.
      * If not, message them a warning.
@@ -47,11 +50,25 @@ class RelicsCommandValidator(private val s: CommandSender) {
      * @return whether the sender is holding a non-stackable item.
      * @throws IllegalArgumentException if the sender is not a player.
      */
-    fun assertValidMaterial() =
+    fun assertHeldItemValidMaterial() =
         if (s !is Player) {
             throw IllegalArgumentException("This function should only be run by players -- this should have been checked earlier!")
         } else if (!Relic.validMaterial(s.inventory.itemInMainHand.type)) {
             sendErrorMessage(s, "This item cannot be registered as a relic.")
+            false
+        } else true
+
+    /**
+     * Asserts that the item held by the player is not already registered as a relic.
+     *
+     * @return `true` if the held item is not already registered as a relic, otherwise `false`.
+     * @throws IllegalArgumentException if the sender is not a player.
+     */
+    fun assertHeldItemNotAlreadyRelic() =
+        if (s !is Player) {
+            throw IllegalArgumentException("This function should only be run by players -- this should have been checked earlier!")
+        } else if (itemIntegrator.isRelic(s.inventory.itemInMainHand)) {
+            sendErrorMessage(s, "This item is already registered as a relic.")
             false
         } else true
 
