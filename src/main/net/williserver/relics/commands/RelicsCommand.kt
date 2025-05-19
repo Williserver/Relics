@@ -101,7 +101,7 @@ private class RelicSubcommandExecutor(
      * @return Whether the command was invoked with the correct number of arguments.
      */
     fun register(): Boolean {
-        // Argument structure validation. No args
+        // Argument structure validation. One arg: item rarity.
         if (args.size != 1) {
             return false
         }
@@ -109,6 +109,7 @@ private class RelicSubcommandExecutor(
         // Argument semantics validation.
         if (!v.assertValidPlayer()
             || !v.assertSingleItemHeld()
+            || !v.assertItemNonStackable()
             || !v.assertRarityValid(args[0])) {
             return true
         }

@@ -26,7 +26,7 @@ class RelicsCommandValidator(private val s: CommandSender) {
         } else true
 
     /**
-     * Determine whether a playeris holding a single item in their hand.
+     * Determine whether a player is holding a single item in their hand.
      * If not, message them a warning.
      *
      * @return whether the sender is holding a single item.
@@ -37,6 +37,21 @@ class RelicsCommandValidator(private val s: CommandSender) {
             throw IllegalArgumentException("This command can only be run by players.")
         } else if (s.inventory.itemInMainHand.amount != 1) {
             sendErrorMessage(s, "This command can only be run when holding a single item in your hand.")
+            false
+        } else true
+
+    /**
+     * Validates that the item held by the sender is non-stackable.
+     * If it is stackable, send them a warning.
+     *
+     * @return whether the sender is holding a non-stackable item.
+     * @throws IllegalArgumentException if the sender is not a player.
+     */
+    fun assertItemNonStackable() =
+        if (s !is Player) {
+            throw IllegalArgumentException("This function should only be run by players -- this should have been checked earlier!")
+        } else if (s.inventory.itemInMainHand.maxStackSize != 1) {
+            sendErrorMessage(s, "Only non-stackable items can be registered as relics.")
             false
         } else true
 
