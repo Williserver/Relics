@@ -22,7 +22,16 @@ class RelicsPlugin: JavaPlugin() {
     private lateinit var relicSet: RelicSet
 
     override fun onEnable() {
-        saveDefaultConfig() // Ensure data directory prepared, even if no options present.
+        /* Plugin compatibility warnings */
+        if (server.pluginManager.getPlugin("VeinMiner") != null) {
+            logger.err("VeinMiner detected. Ensure that RepairFriendly option is set to true to avoid exploits!")
+        }
+        if (server.pluginManager.getPlugin("Timber") != null) {
+            logger.err("Timber detected. Be advised that Timber treecutting can result in Relics becoming untrackable!")
+        }
+
+        // Ensure data directory prepared, even if no options present.
+        saveDefaultConfig()
 
         /* Initialize relic model */
         relicSet = RelicSet.readFromFile(logger, path)
