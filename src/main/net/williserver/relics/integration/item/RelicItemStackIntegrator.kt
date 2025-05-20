@@ -14,6 +14,7 @@ import org.bukkit.persistence.PersistentDataType
 import org.bukkit.plugin.Plugin
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
+import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.event.entity.ItemDespawnEvent
 import org.bukkit.event.inventory.BrewEvent
 import org.bukkit.event.inventory.BrewingStandFuelEvent
@@ -96,6 +97,14 @@ class RelicItemStackIntegrator(instance: Plugin,
                  * - Willmo3, 5/20/2025
                  */
             }
+
+            /*
+              A note on consumable arrows: these can be picked up again. If not, they'll be caught on despawn.
+              If I end up being wrong, here's a quick handler for deregistering arrows when you shoot them.
+
+            @EventHandler
+            fun onArrowShoot(event: EntityShootBowEvent) = event.consumable?.let { purgeIfRelic(it) }
+             */
 
             @EventHandler
             fun onBrewingStandFuel(event: BrewingStandFuelEvent) = purgeIfRelic(event.fuel)
