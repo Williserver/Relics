@@ -65,12 +65,6 @@ class RelicItemStackIntegrator(instance: Plugin,
     }
 
     /**
-     * @param item The item stack to be checked for relic status.
-     * @return Whether the itemstack has relic metadata.
-     */
-    fun isRelic(item: ItemStack) = item.itemMeta.persistentDataContainer.has(relicKey, PersistentDataType.STRING)
-
-    /**
      * @return listener that listens for events related to the destruction of relic items.
      */
     fun constructRelicRemoveListener(): Listener =
