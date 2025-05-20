@@ -3,6 +3,7 @@ package net.williserver.relics.integration.item
 import com.destroystokyo.paper.event.player.PlayerLaunchProjectileEvent
 import io.papermc.paper.event.block.CompostItemEvent
 import net.kyori.adventure.text.Component
+import net.williserver.relics.model.Relic
 import net.williserver.relics.model.RelicSet
 import net.williserver.relics.session.RelicEvent
 import net.williserver.relics.session.RelicEventBus
@@ -65,6 +66,24 @@ class RelicItemStackIntegrator(instance: Plugin,
     }
 
     /**
+     * @param item The item stack to be checked for relic status.
+     * @return Whether the itemstack has relic metadata.
+     */
+    fun isRelic(item: ItemStack) = item.itemMeta.persistentDataContainer.has(relicKey, PersistentDataType.STRING)
+
+    /**
+     * @param item The item stack from which relic metadata is to be retrieved.
+     * @return The string associated with the relic in the item's metadata, or null if no relic metadata exists.
+     */
+    fun relicFromItem(item: ItemStack): Relic {
+        if (!isRelic(item)) {
+            throw IllegalArgumentException("Item is not a relic, this should have been caught earlier!")
+        }
+
+        return relicSet.relicNamed(item.itemMeta.persistentDataContainer.get(relicKey, PersistentDataType.STRING)!!)!!
+    }
+
+    /**
      * @return listener that listens for events related to the destruction of relic items.
      */
     fun constructRelicRemoveListener(): Listener =
@@ -83,7 +102,6 @@ class RelicItemStackIntegrator(instance: Plugin,
             @EventHandler
             fun onItemDamage(event: EntityDamageEvent) {
                 if (event.entity is Item) {
-
                     purgeIfRelic((event.entity as Item).itemStack)
                 }
 

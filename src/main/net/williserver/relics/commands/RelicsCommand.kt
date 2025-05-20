@@ -3,7 +3,6 @@ package net.williserver.relics.commands
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.NamedTextColor
-import net.williserver.relics.RelicsPlugin.Companion.PLUGIN_MESSAGE_PREFIX
 import net.williserver.relics.integration.item.RelicItemStackIntegrator
 import net.williserver.relics.integration.messaging.prefixedMessage
 import net.williserver.relics.model.Relic
@@ -78,7 +77,7 @@ private class RelicSubcommandExecutor(
     private val args: List<String>,
     private val relicSet: RelicSet,
     private val bus: RelicEventBus,
-    itemIntegrator: RelicItemStackIntegrator
+    private val itemIntegrator: RelicItemStackIntegrator
 ) {
     // Create a validator for this sender.
     private val v = RelicsCommandValidator(s, relicSet, itemIntegrator)
@@ -159,13 +158,10 @@ private class RelicSubcommandExecutor(
         }
 
         // Argument semantics validation. Item held has a valid name, or args[0] is a valid name.
-        val name = getNameArgument()?: return true
-        if (!v.assertNameRefersToRelic(name)) {
-            return true
-        }
+        val relic = getRelicFromImplicitArgument()?: return true
 
         // Validation complete, fire event.
-        bus.fireEvent(RelicEvent.DESTROY, relicSet.relicNamed(name)!!, null, null)
+        bus.fireEvent(RelicEvent.DESTROY, relic, null, null)
         return true
     }
 
@@ -184,13 +180,8 @@ private class RelicSubcommandExecutor(
         }
 
         // Argument semantics validation. Item held has a valid name, or args[0] is a valid name.
-        val name = getNameArgument() ?: return true
-        if (!v.assertNameRefersToRelic(name)) {
-            return true
-        }
-
+        val relic = getRelicFromImplicitArgument() ?: return true
         // Prepare and send message.
-        val relic = relicSet.relicNamed(name)!!
         val message = prefixedMessage(Component.text("Relic Information:", NamedTextColor.GOLD))
             .append(relicEntry(relic))
 
@@ -232,26 +223,36 @@ private class RelicSubcommandExecutor(
         }
 
     /**
-     * Determines the name argument based on the number of provided arguments or the current item held by the player.
+     * Attempts to retrieve a relic based on the implicit context or provided arguments.
      *
-     * - If no arguments are provided (args size is 0):
-     *   - Validates whether the sender is a player and if they are holding a single item. If either condition fails, returns null.
-     *   - If both checks pass, retrieves the display name of the held item, removes its starting rarity, and returns the result.
-     * - If one argument is provided (args size is 1), replaces underscores with spaces in the argument and returns the modified value.
-     * - If more than one argument is provided, returns null.
+     * This function determines the relic in one of the following ways:
+     * - If no arguments are provided:
+     *   - Verifies the sender is a player and is holding a single item.
+     *   - Extracts the item's name from the player's held item and matches it against the relic set.
+     * - If one argument is provided:
+     *   - Converts underscores in the argument to spaces and searches for a matching relic name.
+     * - If more than one argument is provided:
+     *   - Returns null as no valid match can be determined.
      *
-     * @return A string representing the determined name argument or null if validation fails or arguments are invalid.
+     * @return The corresponding relic if found, or null if no relic matches or input validation fails.
      */
-    private fun getNameArgument() =
+    private fun getRelicFromImplicitArgument() =
         when (args.size) {
             0 ->
                 if (!v.assertValidPlayer()
-                    || !v.assertSingleItemHeld()) {
+                    || !v.assertSingleItemHeld()
+                    // Nominal check used to ensure that the item is still a relic.
+                    || !v.assertNameRefersToRelic(nameWithoutRarity(itemName((s as Player).inventory.itemInMainHand)))
+                    // Deep check used to ensure that this item has the metadata needed to guarantee relic status.
+                    || !v.assertHeldItemIsRelic()) {
                     null
                 } else {
-                    nameWithoutRarity(itemName((s as Player).inventory.itemInMainHand))
+                    // Use the metadata embedded in the itemStack to retrieve the relic.
+                    // This further complicates counterfeiting.
+                    itemIntegrator.relicFromItem(s.inventory.itemInMainHand)
                 }
-            1 -> underscoresToSpaces(args[0])
+            1 ->
+                relicSet.relicNamed(underscoresToSpaces(args[0]))
             else -> null
         }
 
