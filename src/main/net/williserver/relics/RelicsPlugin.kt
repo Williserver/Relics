@@ -60,7 +60,7 @@ class RelicsPlugin: JavaPlugin() {
 
         /* Register commands.*/
         getCommand("relics")!!.setExecutor(RelicsCommand(relicSet, eventBus, integrator))
-        getCommand("relics")!!.tabCompleter = RelicsTabCompleter()
+        getCommand("relics")!!.tabCompleter = RelicsTabCompleter(relicSet)
         logger.info("Finished registering commands.")
 
         logger.info("Relics plugin enabled.")

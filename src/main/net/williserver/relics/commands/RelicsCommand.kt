@@ -203,17 +203,6 @@ private class RelicSubcommandExecutor(
                 .append(Component.text(")", NamedTextColor.GRAY))
         }
 
-    /*
-     * Static helpers for interfacing with relics CLI
-     */
-    companion object {
-        /**
-         * @param name Name with underscores to remove.
-         * @return the name without underscores. Allows spaces for relic names.
-         */
-        fun underscoresToSpaces(name: String) = name.replace("_", " ")
-    }
-
     // TODO: relic info
     // -- given an item in your hand, check if it is a relic.
     // -- if so, report information.
@@ -241,4 +230,19 @@ private class RelicSubcommandExecutor(
     // -- given a player, report what relics they own.
 
 } // end relic subcommand executor
+
+    /*
+     * Static helpers for interfacing with relics CLI
+     */
+    companion object {
+        /**
+         * @return the name with underscores replaced by spaces.
+         */
+        fun underscoresToSpaces(name: String) = name.replace("_", " ")
+
+        /**
+         * @return the name with spaces replaced by underscores.
+         */
+        fun spacesToUnderscores(name: String) = name.replace(" ", "_")
+    }
 } // end relics command

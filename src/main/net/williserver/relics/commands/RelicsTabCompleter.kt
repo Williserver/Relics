@@ -1,15 +1,18 @@
 package net.williserver.relics.commands
 
+import net.williserver.relics.model.RelicSet
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabCompleter
+import net.williserver.relics.commands.RelicsCommand.Companion.spacesToUnderscores
 
 /**
  * State for relics tab completion.
+ * @param relicSet Set of relics for this session. Used to auto-complete relic names.
  *
  * @author Willmo3
  */
-class RelicsTabCompleter: TabCompleter {
+class RelicsTabCompleter(val relicSet: RelicSet): TabCompleter {
     /**
      * Tab completion suggestions for relics command.
      *
@@ -39,9 +42,11 @@ class RelicsTabCompleter: TabCompleter {
             }
             2 -> {
                 when (args[0].lowercase()) {
-                    "register" -> completions.addAll(setOf("common", "rare", "epic", "legendary", "unique"))
+                    "register" ->
+                        completions.addAll(setOf("common", "rare", "epic", "legendary", "unique"))
+                    "deregister" ->
+                        relicSet.relics().forEach { relic -> completions.add(spacesToUnderscores(relic.name)) }
                 }
-                // TODO: tab completion for different relic names.
                 completions.removeAll{ !it.startsWith(args[1], ignoreCase = true) }
             }
         }
