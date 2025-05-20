@@ -58,12 +58,13 @@ class RelicItemStackIntegrator(instance: Plugin,
         relicItem.editMeta {
             // Convert to uppercase to match old ChatColor enum name.
             val colorCode = ChatColor.valueOf(relic.rarity.color.toString().uppercase())
-            it.setDisplayName("$colorCode${relic.rarity} ${relic.name}")
+            // Prefix with bold code
+            it.setDisplayName("$colorCode§l${relic.rarity} ${relic.name}")
             it.persistentDataContainer.set(relicKey, PersistentDataType.STRING, relic.name)
         }
     }
 
-    /***
+    /**
      * @param item The item stack to be checked for relic status.
      * @return Whether the itemstack has relic metadata.
      */
