@@ -184,7 +184,7 @@ private class RelicSubcommandExecutor(
         }
 
         // Argument semantics validation. Item held has a valid name, or args[0] is a valid name.
-        val name = nameWithoutRarity (getNameArgument() ?: return true)
+        val name = getNameArgument() ?: return true
         if (!v.assertNameRefersToRelic(name)) {
             return true
         }
