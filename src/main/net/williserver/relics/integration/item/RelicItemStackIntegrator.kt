@@ -1,5 +1,6 @@
 package net.williserver.relics.integration.item
 
+import com.destroystokyo.paper.event.player.PlayerLaunchProjectileEvent
 import io.papermc.paper.event.block.CompostItemEvent
 import net.kyori.adventure.text.Component
 import net.williserver.relics.model.RelicSet
@@ -16,6 +17,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.event.entity.ItemDespawnEvent
+import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.bukkit.event.inventory.BrewEvent
 import org.bukkit.event.inventory.BrewingStandFuelEvent
 import org.bukkit.event.inventory.FurnaceBurnEvent
@@ -69,7 +71,6 @@ class RelicItemStackIntegrator(instance: Plugin,
     fun constructRelicRemoveListener(): Listener =
         object: Listener {
             // TODO: use water
-            // TODO: on potion throw -- including bottle 'o enchanting
             // TODO: on enchant
 
             /*
@@ -83,6 +84,7 @@ class RelicItemStackIntegrator(instance: Plugin,
             @EventHandler
             fun onItemDamage(event: EntityDamageEvent) {
                 if (event.entity is Item) {
+
                     purgeIfRelic((event.entity as Item).itemStack)
                 }
 
@@ -97,6 +99,9 @@ class RelicItemStackIntegrator(instance: Plugin,
                  * - Willmo3, 5/20/2025
                  */
             }
+
+            @EventHandler
+            fun onProjectileLaunch(event: PlayerLaunchProjectileEvent) = purgeIfRelic(event.itemStack)
 
             /*
               A note on consumable arrows: these can be picked up again. If not, they'll be caught on despawn.
