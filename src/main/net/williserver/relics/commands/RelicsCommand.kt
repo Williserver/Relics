@@ -16,6 +16,7 @@ import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 
 /**
  * The RelicsCommand class represents a command related to relics.
@@ -133,14 +134,7 @@ private class RelicSubcommandExecutor(
         }
 
         val item = (s as Player).inventory.itemInMainHand
-        val name =
-            if (item.hasItemMeta() && item.itemMeta!!.hasDisplayName()) {
-                // Since we're registering relic under plaintext display name, acceptable to use this.
-                item.itemMeta!!.displayName
-            } else {
-                item.type.name.lowercase().replace('_', ' ')
-            }
-
+        val name = itemName(item)
         if (!v.assertValidName(name) || !v.assertUniqueName(name, relicSet)) {
             return true
         }
@@ -156,12 +150,23 @@ private class RelicSubcommandExecutor(
      * @return Whether the command was invoked with the correct number of arguments.
      */
     fun deregister(): Boolean {
-        // Argument structure validation. One arg: item name.
-        if (args.size != 1) {
-            return false
+        // Argument validation:
+        // -- either one argument (relic name) that refers to a reliuc
+        // -- or no arguments, and item in hand's name is implicit first argument.
+        var name = when (args.size) {
+            0 ->
+                if (!v.assertValidPlayer()
+                     || !v.assertSingleItemHeld()) {
+                    return true
+                } else {
+                    itemName((s as Player).inventory.itemInMainHand)
+                }
+            1 -> args[0]
+            // Argument structure error
+            else -> return false
         }
-        // Argument semantics validation: argument refers to relic.
-        val name = underscoresToSpaces(args[0])
+        // Cut rarity prefix
+        name = nameWithoutRarity(name)
         if (!v.assertNameRefersToRelic(name, relicSet)) {
             return true
         }
@@ -244,5 +249,25 @@ private class RelicSubcommandExecutor(
          * @return the name with spaces replaced by underscores.
          */
         fun spacesToUnderscores(name: String) = name.replace(" ", "_")
+
+        /**
+         * @return An item name with starting rarity string removed.
+         */
+        fun nameWithoutRarity(name: String) = name.replaceBefore(" ", "").trimStart()
+
+        /**
+         * Retrieves the display name of an item. If no custom display name exists,
+         * the item's default type name is returned in lowercase with underscores replaced by spaces.
+         *
+         * @param item The item stack from which the name is to be retrieved.
+         * @return The display name of the item or its default type name formatted as a string.
+         */
+        fun itemName(item: ItemStack) =
+            if (item.hasItemMeta() && item.itemMeta!!.hasDisplayName()) {
+                // Since we're registering relic under plaintext display name, acceptable to use this.
+                item.itemMeta!!.displayName
+            } else {
+                item.type.name.lowercase().replace('_', ' ')
+            }
     }
 } // end relics command

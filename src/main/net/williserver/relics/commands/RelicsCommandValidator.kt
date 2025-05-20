@@ -60,6 +60,22 @@ class RelicsCommandValidator(private val s: CommandSender,
         } else true
 
     /**
+     * Validates that the item held by the player is a relic.
+     * If the sender is not a player, an exception is thrown.
+     * If the held item is not a relic, an error message is sent to the sender.
+     *
+     * @return whether the held item is a relic.
+     * @throws IllegalArgumentException if the sender is not a player.
+     */
+    fun assertHeldItemValidRelic() =
+        if (s !is Player) {
+            throw IllegalArgumentException("This function should only be run by players -- this should have been checked earlier!")
+        } else if (!itemIntegrator.isRelic(s.inventory.itemInMainHand)) {
+            sendErrorMessage(s, "This item is not a relic.")
+            false
+        } else true
+
+    /**
      * Asserts that the item held by the player is not already registered as a relic.
      *
      * @return `true` if the held item is not already registered as a relic, otherwise `false`.
