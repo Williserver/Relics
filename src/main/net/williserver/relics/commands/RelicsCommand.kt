@@ -53,6 +53,7 @@ class RelicsCommand(
         return when (subcommand) {
             "deregister" -> execute.deregister()
             "help" -> execute.help()
+            "info" -> execute.info()
             "register" -> execute.register()
             "list" -> execute.list()
             else -> false
@@ -95,11 +96,13 @@ private class RelicSubcommandExecutor(
 
         val deregister = generateCommandHelp("deregister [name]", "manually deregister a relic by name")
         val help = generateCommandHelp("help", "pull up this help menu")
+        val info = generateCommandHelp("info [name]", "get information about a specific relic by name")
         val list = generateCommandHelp("list", "list all relics")
         val register = generateCommandHelp("register [name]", "register the item that you're holding as a Relic.")
         s.sendMessage(header
             .append(deregister)
             .append(help)
+            .append(info)
             .append(list)
             .append(register)
         )
@@ -156,9 +159,7 @@ private class RelicSubcommandExecutor(
         }
 
         // Argument semantics validation. Item held has a valid name, or args[0] is a valid name.
-        var name = getNameArgument()?: return true
-        // Cut rarity prefix
-        name = nameWithoutRarity(name)
+        val name = getNameArgument()?: return true
         if (!v.assertNameRefersToRelic(name)) {
             return true
         }
@@ -167,10 +168,35 @@ private class RelicSubcommandExecutor(
         bus.fireEvent(RelicEvent.DESTROY, relicSet.relicNamed(name)!!, null, null)
         return true
     }
-//
-//    fun info(): Boolean {
-//
-//    }
+
+    /**
+     * Retrieves and displays information about a specified relic based on the provided arguments
+     * or the currently held item.
+     * - Determines the relic name from the arguments or the held item's name.
+     * - Error messages are sent to the sender if the validation fails.
+     *
+     * @return Whether the method was invoked with the correct number of arguments.
+     */
+    fun info(): Boolean {
+        // Argument structure validation. One optional arg: item name.
+        if (args.size > 1) {
+            return false
+        }
+
+        // Argument semantics validation. Item held has a valid name, or args[0] is a valid name.
+        val name = nameWithoutRarity (getNameArgument() ?: return true)
+        if (!v.assertNameRefersToRelic(name)) {
+            return true
+        }
+
+        // Prepare and send message.
+        val relic = relicSet.relicNamed(name)!!
+        val message = Component.text("$PLUGIN_MESSAGE_PREFIX Relic Information:", NamedTextColor.GOLD)
+            .append(relicEntry(relic))
+
+        s.sendMessage(message)
+        return true
+    }
 
     /**
      * Sends a message to the command sender containing a formatted list of all relics.
@@ -178,17 +204,16 @@ private class RelicSubcommandExecutor(
      * @return `true` after successfully sending the list message.
      */
     fun list(): Boolean {
+        // TODO: cleaner with fold
         var message = Component.text("$PLUGIN_MESSAGE_PREFIX All Relics: ", NamedTextColor.GOLD)
-
-        fun relicEntry(relic: Relic)
-            = Component.text("\n - ", NamedTextColor.RED)
-            .append(relic.asDisplayComponent())
-            .append(formatOwner(relic) ?: Component.text(" (unclaimed)", NamedTextColor.GRAY))
-
         relicSet.relics().forEach { message = message.append(relicEntry(it)) }
         s.sendMessage(message)
         return true
     }
+
+    /*
+     * Internal instance-specific helpers
+     */
 
     /**
      * Formats the ownership information of a relic if the relic has an associated owner.
@@ -206,14 +231,15 @@ private class RelicSubcommandExecutor(
         }
 
     /**
-     * Determines the appropriate name argument based on the provided arguments or the player's currently held item.
+     * Determines the name argument based on the number of provided arguments or the current item held by the player.
      *
-     * - If no arguments are provided, it validates if the sender is a valid player and is holding a single item.
-     *   If these validations pass, the name of the held item is retrieved.
-     * - If exactly one argument is provided, it uses that argument as the name.
-     * - If more than one argument is provided, it returns null.
+     * - If no arguments are provided (args size is 0):
+     *   - Validates whether the sender is a player and if they are holding a single item. If either condition fails, returns null.
+     *   - If both checks pass, retrieves the display name of the held item, removes its starting rarity, and returns the result.
+     * - If one argument is provided (args size is 1), replaces underscores with spaces in the argument and returns the modified value.
+     * - If more than one argument is provided, returns null.
      *
-     * @return The determined name as a string or null if the validation fails or multiple arguments are provided.
+     * @return A string representing the determined name argument or null if validation fails or arguments are invalid.
      */
     private fun getNameArgument() =
         when (args.size) {
@@ -222,21 +248,20 @@ private class RelicSubcommandExecutor(
                     || !v.assertSingleItemHeld()) {
                     null
                 } else {
-                    itemName((s as Player).inventory.itemInMainHand)
+                    nameWithoutRarity(itemName((s as Player).inventory.itemInMainHand))
                 }
-            1 -> args[0]
+            1 -> underscoresToSpaces(args[0])
             else -> null
         }
 
-    // TODO: relic info
-    // -- given an item in your hand, check if it is a relic.
-    // -- if so, report information.
-
-    // Validate:
-    // -- Sender is player
-
-    // Return
-    // -- Information about the item, or nothing if no info.
+    /**
+     * @param relic Relic to format
+     * @return A component mapping the relic's formatting to its owner.
+     */
+    private fun relicEntry(relic: Relic) =
+        Component.text("\n - ", NamedTextColor.RED)
+        .append(relic.asDisplayComponent())
+            .append(formatOwner(relic) ?: Component.text(" (unclaimed)", NamedTextColor.GRAY))
 
     // TODO: claim relic
     // -- given an item in your hand, check if it's a relic
