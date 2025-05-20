@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.NamedTextColor
 import net.williserver.relics.integration.item.RelicItemStackIntegrator
+import net.williserver.relics.integration.item.RelicItemStackIntegrator.Companion.itemName
 import net.williserver.relics.integration.messaging.prefixedMessage
 import net.williserver.relics.model.Relic
 import net.williserver.relics.model.RelicRarity
@@ -15,7 +16,6 @@ import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
-import org.bukkit.inventory.ItemStack
 
 /**
  * The RelicsCommand class represents a command related to relics.
@@ -58,6 +58,26 @@ class RelicsCommand(
             else -> false
         }
     }
+
+    /*
+     * Static helpers for interfacing with relics CLI
+     */
+    companion object {
+        /**
+         * @return the name with underscores replaced by spaces.
+         */
+        fun underscoresToSpaces(name: String) = name.replace("_", " ")
+
+        /**
+         * @return the name with spaces replaced by underscores.
+         */
+        fun spacesToUnderscores(name: String) = name.replace(" ", "_")
+
+        /**
+         * @return An item name with starting rarity string removed.
+         */
+        fun nameWithoutRarity(name: String) = name.replaceBefore(" ", "").trimStart()
+    } // End static helpers
 
 /**
  * Handles the execution of subcommands related to relics.
@@ -157,7 +177,7 @@ private class RelicSubcommandExecutor(
             return false
         }
 
-        // Argument semantics validation. Item held has a valid name, or args[0] is a valid name.
+        // Argument semantics validation. Item held is a relic, or args[0] is a valid name.
         val relic = getRelicFromImplicitArgument()?: return true
 
         // Validation complete, fire event.
@@ -179,7 +199,7 @@ private class RelicSubcommandExecutor(
             return false
         }
 
-        // Argument semantics validation. Item held has a valid name, or args[0] is a valid name.
+        // Argument semantics validation. Item held is a relic, or args[0] is a valid name.
         val relic = getRelicFromImplicitArgument() ?: return true
         // Prepare and send message.
         val message = prefixedMessage(Component.text("Relic Information:", NamedTextColor.GOLD))
@@ -202,6 +222,22 @@ private class RelicSubcommandExecutor(
         )
         return true
     }
+
+    // TODO: claim relic
+    // -- given an item in your hand, check if it's a relic
+    // -- if so, mark you as the new owner of the relic.
+
+    // Validate:
+    // -- Sender is player
+
+    // Report:
+    // -- Whether you claimed the relic or not.
+
+    // TODO: top players
+    // -- report a list of players, sorted by the value of the relics they own.
+
+    // TODO: relic by player.
+    // -- given a player, report what relics they own.
 
     /*
      * Internal instance-specific helpers
@@ -265,56 +301,5 @@ private class RelicSubcommandExecutor(
         .append(relic.asDisplayComponent())
             .append(formatOwner(relic) ?: Component.text(" (unclaimed)", NamedTextColor.GRAY))
 
-    // TODO: claim relic
-    // -- given an item in your hand, check if it's a relic
-    // -- if so, mark you as the new owner of the relic.
-
-    // Validate:
-    // -- Sender is player
-
-    // Report:
-    // -- Whether you claimed the relic or not.
-
-    // TODO: top players
-    // -- report a list of players, sorted by the value of the relics they own.
-
-    // TODO: relic by player.
-    // -- given a player, report what relics they own.
-
 } // end relic subcommand executor
-
-    /*
-     * Static helpers for interfacing with relics CLI
-     */
-    companion object {
-        /**
-         * @return the name with underscores replaced by spaces.
-         */
-        fun underscoresToSpaces(name: String) = name.replace("_", " ")
-
-        /**
-         * @return the name with spaces replaced by underscores.
-         */
-        fun spacesToUnderscores(name: String) = name.replace(" ", "_")
-
-        /**
-         * @return An item name with starting rarity string removed.
-         */
-        fun nameWithoutRarity(name: String) = name.replaceBefore(" ", "").trimStart()
-
-        /**
-         * Retrieves the display name of an item. If no custom display name exists,
-         * the item's default type name is returned in lowercase with underscores replaced by spaces.
-         *
-         * @param item The item stack from which the name is to be retrieved.
-         * @return The display name of the item or its default type name formatted as a string.
-         */
-        fun itemName(item: ItemStack) =
-            if (item.hasItemMeta() && item.itemMeta!!.hasDisplayName()) {
-                // Since we're registering relic under plaintext display name, acceptable to use this.
-                item.itemMeta!!.displayName
-            } else {
-                item.type.name.lowercase().replace('_', ' ')
-            }
-    }
 } // end relics command

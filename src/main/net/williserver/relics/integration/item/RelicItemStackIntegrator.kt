@@ -83,6 +83,30 @@ class RelicItemStackIntegrator(instance: Plugin,
         return relicSet.relicNamed(item.itemMeta.persistentDataContainer.get(relicKey, PersistentDataType.STRING)!!)!!
     }
 
+    /*
+     * Static helpers
+     */
+    companion object {
+        /**
+         * Retrieves the display name of an item. If no custom display name exists,
+         * the item's default type name is returned in lowercase with underscores replaced by spaces.
+         *
+         * @param item The item stack from which the name is to be retrieved.
+         * @return The display name of the item or its default type name formatted as a string.
+         */
+        fun itemName(item: ItemStack) =
+            if (item.hasItemMeta() && item.itemMeta!!.hasDisplayName()) {
+                // Since we're registering relic under plaintext display name, acceptable to use this.
+                item.itemMeta!!.displayName
+            } else {
+                item.type.name.lowercase().replace('_', ' ')
+            }
+    } // End static helpers
+
+    /*
+     * Direct server event listener integration
+     */
+
     /**
      * @return listener that listens for events related to the destruction of relic items.
      */
@@ -159,7 +183,7 @@ class RelicItemStackIntegrator(instance: Plugin,
             fun onPlayerDestroyItem(event: PlayerItemBreakEvent) = purgeIfRelic(event.brokenItem)
 
             /*
-             * Internal helpers
+             * Internal listener helpers
              */
 
             /**
@@ -181,7 +205,5 @@ class RelicItemStackIntegrator(instance: Plugin,
                 // The item is a relic that has just been destroyed.
                 bus.fireEvent(RelicEvent.DESTROY, relic)
             }
-        }
-}
-
-//
+        } // end server event listener
+} // end itemset integration

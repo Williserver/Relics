@@ -1,6 +1,5 @@
 package net.williserver.relics.commands
 
-import net.williserver.relics.commands.RelicsCommand.Companion.itemName
 import net.williserver.relics.integration.item.RelicItemStackIntegrator
 import net.williserver.relics.integration.messaging.sendErrorMessage
 import net.williserver.relics.model.Relic
@@ -112,20 +111,7 @@ class RelicsCommandValidator(private val s: CommandSender,
      */
     fun assertNameRefersToRelic(name: String) =
         if (relics.relicNamed(name) == null) {
-            sendErrorMessage(s, "There is no relic name \"$name\".")
-            false
-        } else true
-
-    /**
-     * Asserts that the specified name does not refer to an existing relic.
-     * If a relic with the provided name exists, an error message will be sent to the sender.
-     *
-     * @param name The name to check against the existing relics.
-     * @return whether the name refers to an existing relic.
-     */
-    fun assertNameDoesNotReferToRelic(name: String) =
-        if (relics.relicNamed(name) != null) {
-            sendErrorMessage(s, "There is already a relic name \"$name\".")
+            sendErrorMessage(s, "There is no relic named \"$name\".")
             false
         } else true
 
