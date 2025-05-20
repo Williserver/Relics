@@ -64,6 +64,8 @@ class RelicsCommandValidator(private val s: CommandSender,
 
     /**
      * Asserts that the item held by the player is not already registered as a relic.
+     * Uses deep equivalence, checking item metadata -- this means that items that were once relics cannot be re-registered!
+     * However, it provides better protection against scamming. Lets you confirm the real relic.
      *
      * @return `true` if the held item is not already registered as a relic, otherwise `false`.
      * @throws IllegalArgumentException if the sender is not a player.
@@ -71,9 +73,10 @@ class RelicsCommandValidator(private val s: CommandSender,
     fun assertHeldItemNotAlreadyRelic() =
         if (s !is Player) {
             throw IllegalArgumentException("This function should only be run by players -- this should have been checked earlier!")
-        } else {
-            assertNameDoesNotReferToRelic(itemName(s.inventory.itemInMainHand))
-        }
+        } else if (itemIntegrator.isRelic(s.inventory.itemInMainHand)) {
+            sendErrorMessage(s, "This item was already registered as a relic.")
+            false
+        } else true
 
     /**
      * Assert that the name provided is valid. If not, message sender a warning.
