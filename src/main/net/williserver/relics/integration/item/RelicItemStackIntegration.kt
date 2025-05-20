@@ -8,7 +8,6 @@ import net.williserver.relics.session.RelicEventBus
 import net.williserver.relics.session.RelicLifecycleListener
 import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
-import org.bukkit.entity.Entity
 import org.bukkit.entity.Item
 import org.bukkit.event.EventHandler
 import org.bukkit.persistence.PersistentDataType
@@ -16,12 +15,10 @@ import org.bukkit.plugin.Plugin
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.ItemDespawnEvent
-import org.bukkit.event.entity.ItemSpawnEvent
 import org.bukkit.event.inventory.BrewEvent
 import org.bukkit.event.inventory.BrewingStandFuelEvent
 import org.bukkit.event.inventory.FurnaceBurnEvent
 import org.bukkit.event.inventory.FurnaceSmeltEvent
-import org.bukkit.event.player.PlayerBucketFillEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.inventory.ItemStack
@@ -71,6 +68,9 @@ class RelicItemStackIntegrator(instance: Plugin,
     fun constructRelicRemoveListener(): Listener =
         object: Listener {
             // TODO: use water
+            // TODO: on potion throw -- including bottle 'o enchanting
+            // TODO: on enchant
+            // TODO: potion material on top of brewing stand.
 
             /*
              * Listeners for various ways of destroying an item.
@@ -81,15 +81,22 @@ class RelicItemStackIntegrator(instance: Plugin,
              * is a relic item. If so, it must have been destroyed and the destroy event is triggered.
              */
             @EventHandler
-            fun onDestroyEvent(event: EntityDamageEvent) {
+            fun onItemDamage(event: EntityDamageEvent) {
                 if (event.entity is Item) {
                     purgeIfRelic((event.entity as Item).itemStack)
                 }
-            }
 
-            // TODO: on potion throw -- including bottle 'o enchanting
-            // TODO: on enchant
-            // TODO: potion material on top of brewing stand.
+                /*
+                 * A note on item damage.
+                 * There is some disagreement in the Spigot community over whether an item is immediately destroyed on taking damage.
+                 * In my testing, I have found that even if the damage event fires multiple times, an item WILL be destroyed if it takes even a single damage.
+                 * Therefore, I will not be performing any item HP tests -- if it takes damage once, deregister that Relic!
+                 *
+                 * However, in case I end up being wrong, I've written a prototype solution for handling multi-hitpoint items.
+                 * See commit 3613bfd3acd36c24693176e020c91bf501516ae3, which I have now reset.
+                 * - Willmo3, 5/20/2025
+                 */
+            }
 
             @EventHandler
             fun onBrewingStandFuel(event: BrewingStandFuelEvent) = purgeIfRelic(event.fuel)
