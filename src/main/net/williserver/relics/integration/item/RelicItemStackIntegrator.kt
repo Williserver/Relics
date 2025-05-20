@@ -8,6 +8,7 @@ import net.williserver.relics.session.RelicEvent
 import net.williserver.relics.session.RelicEventBus
 import net.williserver.relics.session.RelicLifecycleListener
 import org.bukkit.Bukkit
+import org.bukkit.ChatColor
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Item
 import org.bukkit.event.EventHandler
@@ -55,7 +56,9 @@ class RelicItemStackIntegrator(instance: Plugin,
         }
 
         relicItem.editMeta {
-            it.setDisplayName("${relic.rarity} ${relic.name}")
+            // Convert to uppercase to match old ChatColor enum name.
+            val colorCode = ChatColor.valueOf(relic.rarity.color.toString().uppercase())
+            it.setDisplayName("$colorCode${relic.rarity} ${relic.name}")
             it.persistentDataContainer.set(relicKey, PersistentDataType.STRING, relic.name)
         }
     }
