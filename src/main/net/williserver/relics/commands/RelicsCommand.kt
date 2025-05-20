@@ -191,7 +191,7 @@ private class RelicSubcommandExecutor(
 
         // Prepare and send message.
         val relic = relicSet.relicNamed(name)!!
-        val message = Component.text("$PLUGIN_MESSAGE_PREFIX Relic Information:", NamedTextColor.GOLD)
+        val message = prefixedMessage(Component.text("Relic Information:", NamedTextColor.GOLD))
             .append(relicEntry(relic))
 
         s.sendMessage(message)
@@ -204,10 +204,11 @@ private class RelicSubcommandExecutor(
      * @return `true` after successfully sending the list message.
      */
     fun list(): Boolean {
-        // TODO: cleaner with fold
-        var message = Component.text("$PLUGIN_MESSAGE_PREFIX All Relics: ", NamedTextColor.GOLD)
-        relicSet.relics().forEach { message = message.append(relicEntry(it)) }
-        s.sendMessage(message)
+        s.sendMessage(relicSet
+            .relics()
+            .fold(prefixedMessage(Component.text("All Relics:", NamedTextColor.GOLD)))
+                { message, relic -> message.append(relicEntry(relic)) }
+        )
         return true
     }
 
