@@ -11,6 +11,9 @@ commands:
     usage: "Use /relics help for usage information."
 
 permissions:
+  relics.deregister:
+    description: Allows /relics deregister
+    default: op
   relics.register:
     description: Allows /relics register
     default: op

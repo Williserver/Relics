@@ -51,6 +51,7 @@ class RelicsCommand(
 
         val execute = RelicSubcommandExecutor(sender, args.drop(1), relicSet, bus, itemIntegrator)
         return when (subcommand) {
+            "deregister" -> execute.deregister()
             "help" -> execute.help()
             "register" -> execute.register()
             "list" -> execute.list()
@@ -92,10 +93,12 @@ private class RelicSubcommandExecutor(
         fun generateCommandHelp(name: String, text: String)
             = bullet.append(Component.text("$name: ", NamedTextColor.RED).append(Component.text(text, NamedTextColor.GRAY)))
 
+        val deregister = generateCommandHelp("deregister [name]", "manually deregister a relic by name")
         val help = generateCommandHelp("help", "pull up this help menu")
         val list = generateCommandHelp("list", "list all relics")
         val register = generateCommandHelp("register [name]", "register the item that you're holding as a Relic.")
         s.sendMessage(header
+            .append(deregister)
             .append(help)
             .append(list)
             .append(register)
@@ -145,6 +148,26 @@ private class RelicSubcommandExecutor(
 
         // Fire event, informing listeners to perform operation.
         bus.fireEvent(RelicEvent.REGISTER, Relic(name, RelicRarity.rarityFromName(args[0])!!), s.uniqueId, item)
+        return true
+    }
+
+    /**
+     * Deregisters a relic by its name, triggering a `DESTROY` event if the relic exists.
+     *
+     * @return Whether the command was invoked with the correct number of arguments.
+     */
+    fun deregister(): Boolean {
+        // Argument structure validation. One arg: item name.
+        if (args.size != 1) {
+            return false
+        }
+        // Argument semantics validation: argument refers to relic.
+        val name = args[0] // TODO: support quotes around name.
+        if (!v.assertNameRefersToRelic(name, relicSet)) {
+            return true
+        }
+
+        bus.fireEvent(RelicEvent.DESTROY, relicSet.relicNamed(name)!!, null, null)
         return true
     }
 

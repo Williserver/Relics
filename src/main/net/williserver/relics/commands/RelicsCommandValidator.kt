@@ -85,6 +85,17 @@ class RelicsCommandValidator(private val s: CommandSender,
         } else true
 
     /**
+     * Assert that the name provided refers to an existing relic. If not, message sender a warning.
+     * @param name Name to check for corresponding relic.
+     * @return whether the name refers to an existing relic.
+     */
+    fun assertNameRefersToRelic(name: String, otherRelics: RelicSet) =
+        if (otherRelics.relicNamed(name) == null) {
+            sendErrorMessage(s, "There is no relic name \"$name\".")
+            false
+        } else true
+
+    /**
      * Asserts that the provided name is unique among the existing relics in the given relic set.
      * If a relic with the same name already exists, an error message will be sent.
      *
