@@ -93,8 +93,13 @@ private class RelicSubcommandExecutor(
             = bullet.append(Component.text("$name: ", NamedTextColor.RED).append(Component.text(text, NamedTextColor.GRAY)))
 
         val help = generateCommandHelp("help", "pull up this help menu")
+        val list = generateCommandHelp("list", "list all relics")
         val register = generateCommandHelp("register [name]", "register the item that you're holding as a Relic.")
-        s.sendMessage(header.append(help).append(register))
+        s.sendMessage(header
+            .append(help)
+            .append(list)
+            .append(register)
+        )
         return true
     }
 
