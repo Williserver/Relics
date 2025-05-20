@@ -33,30 +33,30 @@ class RelicsCommand(
     private val itemIntegrator: RelicItemStackIntegrator): CommandExecutor {
 
     /**
-     * Handles the execution of a command related to relics.
+     * Executes commands related to relics based on the provided subcommand and arguments.
      *
-     * This method processes the command sent by the specified sender
-     * and determines the appropriate action to take based on the provided arguments.
-     * If no arguments are provided, it defaults to sending a help message to the sender.
-     *
-     * @param sender Source of the command, such as a player or the console.
-     * @param command Command being executed.
-     * @param label Alias used for the command.
-     * @param args Arguments for subcommand
+     * @param sender The entity or console executing the command.
+     * @param command The command being executed.
+     * @param label The alias of the command used.
+     * @param args The arguments provided along with the command.
      * @return Whether the command was invoked with the correct number of arguments.
      */
-    override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>) =
-        if (args.isNotEmpty()) {
-            val subcommand = args[0]
-            val execute = RelicSubcommandExecutor(sender, args.drop(1), relicSet, bus, itemIntegrator)
+    override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
+        val subcommand = if (args.isNotEmpty()) args[0] else "help"
+        // Invariant: permissions node for each subcommand.
+        if (!sender.hasPermission("relics.$subcommand")) {
+            sender.sendMessage(prefixedMessage(Component.text("You do not have permission to use this command.", NamedTextColor.RED)))
+            return true
+        }
 
-            when (subcommand) {
-                "help" -> execute.help()
-                "register" -> execute.register()
-                "list" -> execute.list()
-                else -> false
-            }
-        } else RelicSubcommandExecutor(sender, args.toList(), relicSet, bus, itemIntegrator).help()
+        val execute = RelicSubcommandExecutor(sender, args.drop(1), relicSet, bus, itemIntegrator)
+        return when (subcommand) {
+            "help" -> execute.help()
+            "register" -> execute.register()
+            "list" -> execute.list()
+            else -> false
+        }
+    }
 
 /**
  * Handles the execution of subcommands related to relics.
@@ -111,7 +111,6 @@ private class RelicSubcommandExecutor(
      * @return Whether the command was invoked with the correct number of arguments.
      */
     fun register(): Boolean {
-        // TODO: permissions check
         // Argument structure validation. One arg: item rarity.
         if (args.size != 1) {
             return false

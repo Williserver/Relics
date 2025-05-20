@@ -9,3 +9,14 @@ commands:
   relics:
     description: Base command for interfacing with Relics plugin
     usage: "Use /relics help for usage information."
+
+permissions:
+  relics.register:
+    description: Allows /relics register
+    default: op
+  relics.list:
+    description: Allows /relics list
+    default: true
+  relics.help:
+    description: Allows /relics help
+    default: true
