@@ -70,7 +70,6 @@ class RelicItemStackIntegrator(instance: Plugin,
             // TODO: use water
             // TODO: on potion throw -- including bottle 'o enchanting
             // TODO: on enchant
-            // TODO: potion material on top of brewing stand.
 
             /*
              * Listeners for various ways of destroying an item.
@@ -102,7 +101,7 @@ class RelicItemStackIntegrator(instance: Plugin,
             fun onBrewingStandFuel(event: BrewingStandFuelEvent) = purgeIfRelic(event.fuel)
 
             @EventHandler
-            // Purge all relic bottles.
+            // Purge all relic bottles, as well as the material on top of the brewing stand.
             fun onPotionCreate(event: BrewEvent) = event.contents.forEach {
                 // Be advised -- it may sometimes be null, EVEN IF SPIGOT CLAIMS THIS IS NOT THE CASE!
                 if (it != null) {
@@ -152,9 +151,6 @@ class RelicItemStackIntegrator(instance: Plugin,
                 bus.fireEvent(RelicEvent.DESTROY, relic)
             }
         }
-
-    companion object {
-    }
 }
 
 //
