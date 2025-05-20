@@ -139,7 +139,7 @@ private class RelicSubcommandExecutor(
             return true
         }
 
-        // Fire event, informing listeners to perform operation.
+        // Validation complete, fire event.
         bus.fireEvent(RelicEvent.REGISTER, Relic(name, RelicRarity.rarityFromName(args[0])!!), s.uniqueId, item)
         return true
     }
@@ -150,30 +150,27 @@ private class RelicSubcommandExecutor(
      * @return Whether the command was invoked with the correct number of arguments.
      */
     fun deregister(): Boolean {
-        // Argument validation:
-        // -- either one argument (relic name) that refers to a reliuc
-        // -- or no arguments, and item in hand's name is implicit first argument.
-        var name = when (args.size) {
-            0 ->
-                if (!v.assertValidPlayer()
-                     || !v.assertSingleItemHeld()) {
-                    return true
-                } else {
-                    itemName((s as Player).inventory.itemInMainHand)
-                }
-            1 -> args[0]
-            // Argument structure error
-            else -> return false
+        // Argument structure validation. One optional arg: item name.
+        if (args.size > 1) {
+            return false
         }
+
+        // Argument semantics validation. Item held has a valid name, or args[0] is a valid name.
+        var name = getNameArgument()?: return true
         // Cut rarity prefix
         name = nameWithoutRarity(name)
         if (!v.assertNameRefersToRelic(name, relicSet)) {
             return true
         }
 
+        // Validation complete, fire event.
         bus.fireEvent(RelicEvent.DESTROY, relicSet.relicNamed(name)!!, null, null)
         return true
     }
+//
+//    fun info(): Boolean {
+//
+//    }
 
     /**
      * Sends a message to the command sender containing a formatted list of all relics.
@@ -206,6 +203,29 @@ private class RelicSubcommandExecutor(
             Component.text(" (owned by ", NamedTextColor.GRAY)
                 .append(Component.text(name, NamedTextColor.YELLOW))
                 .append(Component.text(")", NamedTextColor.GRAY))
+        }
+
+    /**
+     * Determines the appropriate name argument based on the provided arguments or the player's currently held item.
+     *
+     * - If no arguments are provided, it validates if the sender is a valid player and is holding a single item.
+     *   If these validations pass, the name of the held item is retrieved.
+     * - If exactly one argument is provided, it uses that argument as the name.
+     * - If more than one argument is provided, it returns null.
+     *
+     * @return The determined name as a string or null if the validation fails or multiple arguments are provided.
+     */
+    private fun getNameArgument() =
+        when (args.size) {
+            0 ->
+                if (!v.assertValidPlayer()
+                    || !v.assertSingleItemHeld()) {
+                    null
+                } else {
+                    itemName((s as Player).inventory.itemInMainHand)
+                }
+            1 -> args[0]
+            else -> null
         }
 
     // TODO: relic info
