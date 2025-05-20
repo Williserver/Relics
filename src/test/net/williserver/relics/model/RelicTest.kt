@@ -17,7 +17,7 @@ class RelicTest {
      */
     @Test
     fun testRelicName() {
-        Relic("T's bottle-o_wine", RelicRarity.Rare)
+        Relic("T's bottle-o-wine", RelicRarity.Rare)
         assertThrows(IllegalArgumentException::class.java) { Relic("", RelicRarity.Rare) }
         assertThrows(IllegalArgumentException::class.java) { Relic(" Leading whitespace!", RelicRarity.Rare) }
     }

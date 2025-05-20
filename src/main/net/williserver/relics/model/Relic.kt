@@ -61,9 +61,9 @@ data class Relic(val name: String, val rarity: RelicRarity) {
          * Validates the name of a relic.
          * A relic must start with a non-whitespace character.
          *
-         * After that, the relic name may contain any letter or digit. It may also contain apostrophes, underscores, dashes, and spaces.
+         * After that, the relic name may contain any letter or digit. It may also contain apostrophes, dashes, and spaces.
          */
-        fun validName(name: String) =  name.matches("^([a-zA-Z0-9]|-|_|')([a-zA-Z0-9]|-|_|'|\\s)*$".toRegex())
+        fun validName(name: String) =  name.matches("^([a-zA-Z0-9]|-|_|')([a-zA-Z0-9]|-|'|\\s)*$".toRegex())
 
         /**
          * Validates whether the provided material is a valid type.

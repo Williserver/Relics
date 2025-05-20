@@ -6,7 +6,6 @@ import net.kyori.adventure.text.format.NamedTextColor
 import net.williserver.relics.RelicsPlugin.Companion.PLUGIN_MESSAGE_PREFIX
 import net.williserver.relics.integration.item.RelicItemStackIntegrator
 import net.williserver.relics.integration.messaging.prefixedMessage
-import net.williserver.relics.integration.messaging.sendCongratsMessage
 import net.williserver.relics.model.Relic
 import net.williserver.relics.model.RelicRarity
 import net.williserver.relics.model.RelicSet
@@ -162,7 +161,7 @@ private class RelicSubcommandExecutor(
             return false
         }
         // Argument semantics validation: argument refers to relic.
-        val name = args[0] // TODO: support quotes around name.
+        val name = underscoresToSpaces(args[0])
         if (!v.assertNameRefersToRelic(name, relicSet)) {
             return true
         }
@@ -203,6 +202,17 @@ private class RelicSubcommandExecutor(
                 .append(Component.text(name, NamedTextColor.YELLOW))
                 .append(Component.text(")", NamedTextColor.GRAY))
         }
+
+    /*
+     * Static helpers for interfacing with relics CLI
+     */
+    companion object {
+        /**
+         * @param name Name with underscores to remove.
+         * @return the name without underscores. Allows spaces for relic names.
+         */
+        fun underscoresToSpaces(name: String) = name.replace("_", " ")
+    }
 
     // TODO: relic info
     // -- given an item in your hand, check if it is a relic.
