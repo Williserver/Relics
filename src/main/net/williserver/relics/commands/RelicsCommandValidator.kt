@@ -1,5 +1,6 @@
 package net.williserver.relics.commands
 
+import net.williserver.relics.commands.RelicsCommand.Companion.itemName
 import net.williserver.relics.integration.item.RelicItemStackIntegrator
 import net.williserver.relics.integration.messaging.sendErrorMessage
 import net.williserver.relics.model.Relic
@@ -13,9 +14,11 @@ import org.bukkit.entity.Player
  * Wrap around a sender.
  *
  * @param s Sender invoking command.
+ * @param relics Set of relics for this session.
  * @param itemIntegrator Utility for checking if an item is a relic.
  */
 class RelicsCommandValidator(private val s: CommandSender,
+                             private val relics: RelicSet,
                              private val itemIntegrator: RelicItemStackIntegrator) {
     /**
      * Determine whether a command sender is a player.
@@ -60,22 +63,6 @@ class RelicsCommandValidator(private val s: CommandSender,
         } else true
 
     /**
-     * Validates that the item held by the player is a relic.
-     * If the sender is not a player, an exception is thrown.
-     * If the held item is not a relic, an error message is sent to the sender.
-     *
-     * @return whether the held item is a relic.
-     * @throws IllegalArgumentException if the sender is not a player.
-     */
-    fun assertHeldItemValidRelic() =
-        if (s !is Player) {
-            throw IllegalArgumentException("This function should only be run by players -- this should have been checked earlier!")
-        } else if (!itemIntegrator.isRelic(s.inventory.itemInMainHand)) {
-            sendErrorMessage(s, "This item is not a relic.")
-            false
-        } else true
-
-    /**
      * Asserts that the item held by the player is not already registered as a relic.
      *
      * @return `true` if the held item is not already registered as a relic, otherwise `false`.
@@ -84,10 +71,9 @@ class RelicsCommandValidator(private val s: CommandSender,
     fun assertHeldItemNotAlreadyRelic() =
         if (s !is Player) {
             throw IllegalArgumentException("This function should only be run by players -- this should have been checked earlier!")
-        } else if (itemIntegrator.isRelic(s.inventory.itemInMainHand)) {
-            sendErrorMessage(s, "This item is already registered as a relic.")
-            false
-        } else true
+        } else {
+            assertNameDoesNotReferToRelic(itemName(s.inventory.itemInMainHand))
+        }
 
     /**
      * Assert that the name provided is valid. If not, message sender a warning.
@@ -105,9 +91,22 @@ class RelicsCommandValidator(private val s: CommandSender,
      * @param name Name to check for corresponding relic.
      * @return whether the name refers to an existing relic.
      */
-    fun assertNameRefersToRelic(name: String, otherRelics: RelicSet) =
-        if (otherRelics.relicNamed(name) == null) {
+    fun assertNameRefersToRelic(name: String) =
+        if (relics.relicNamed(name) == null) {
             sendErrorMessage(s, "There is no relic name \"$name\".")
+            false
+        } else true
+
+    /**
+     * Asserts that the specified name does not refer to an existing relic.
+     * If a relic with the provided name exists, an error message will be sent to the sender.
+     *
+     * @param name The name to check against the existing relics.
+     * @return whether the name refers to an existing relic.
+     */
+    fun assertNameDoesNotReferToRelic(name: String) =
+        if (relics.relicNamed(name) != null) {
+            sendErrorMessage(s, "There is already a relic name \"$name\".")
             false
         } else true
 
@@ -116,11 +115,10 @@ class RelicsCommandValidator(private val s: CommandSender,
      * If a relic with the same name already exists, an error message will be sent.
      *
      * @param name The name of the relic to validate for uniqueness.
-     * @param otherRelics The set of relics to check against for name uniqueness.
      * @return whether the name is unique.
      */
-    fun assertUniqueName(name: String, otherRelics: RelicSet) =
-        if (otherRelics.relicNamed(name) != null) {
+    fun assertUniqueName(name: String) =
+        if (relics.relicNamed(name) != null) {
             sendErrorMessage(s, "There is already a relic named \"$name\".")
             false
         } else true

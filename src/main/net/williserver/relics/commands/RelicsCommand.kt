@@ -80,7 +80,7 @@ private class RelicSubcommandExecutor(
     itemIntegrator: RelicItemStackIntegrator
 ) {
     // Create a validator for this sender.
-    private val v = RelicsCommandValidator(s, itemIntegrator)
+    private val v = RelicsCommandValidator(s, relicSet, itemIntegrator)
 
     /**
      * Sends a help message to the command sender containing details about available commands.
@@ -135,7 +135,7 @@ private class RelicSubcommandExecutor(
 
         val item = (s as Player).inventory.itemInMainHand
         val name = itemName(item)
-        if (!v.assertValidName(name) || !v.assertUniqueName(name, relicSet)) {
+        if (!v.assertValidName(name) || !v.assertUniqueName(name)) {
             return true
         }
 
@@ -159,7 +159,7 @@ private class RelicSubcommandExecutor(
         var name = getNameArgument()?: return true
         // Cut rarity prefix
         name = nameWithoutRarity(name)
-        if (!v.assertNameRefersToRelic(name, relicSet)) {
+        if (!v.assertNameRefersToRelic(name)) {
             return true
         }
 
