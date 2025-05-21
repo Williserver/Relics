@@ -215,8 +215,11 @@ private class RelicSubcommandExecutor(
      * @return `true` after successfully sending the list message.
      */
     fun list(): Boolean {
+        // TODO: pages
         s.sendMessage(relicSet
             .relics()
+            // TODO: filter by owned by player, then by target, if applicable.
+            // (ownerOf != null && (target == null || ownerOf == target)
             .fold(prefixedMessage(Component.text("All Relics:", NamedTextColor.GOLD)))
                 { message, relic -> message.append(relicEntry(relic)) }
         )
@@ -235,9 +238,6 @@ private class RelicSubcommandExecutor(
 
     // TODO: top players
     // -- report a list of players, sorted by the value of the relics they own.
-
-    // TODO: relic by player.
-    // -- given a player, report what relics they own.
 
     /*
      * Internal instance-specific helpers

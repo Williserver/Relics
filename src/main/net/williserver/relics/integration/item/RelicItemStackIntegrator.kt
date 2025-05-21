@@ -23,6 +23,7 @@ import org.bukkit.event.entity.ItemDespawnEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.bukkit.event.inventory.BrewEvent
 import org.bukkit.event.inventory.BrewingStandFuelEvent
+import org.bukkit.event.inventory.CraftItemEvent
 import org.bukkit.event.inventory.FurnaceBurnEvent
 import org.bukkit.event.inventory.FurnaceSmeltEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
@@ -114,6 +115,7 @@ class RelicItemStackIntegrator(instance: Plugin,
         object: Listener {
             // TODO: use water
             // TODO: on enchant
+            // TODO: on repair
 
             /*
              * Listeners for various ways of destroying an item.
@@ -151,6 +153,16 @@ class RelicItemStackIntegrator(instance: Plugin,
             @EventHandler
             fun onArrowShoot(event: EntityShootBowEvent) = event.consumable?.let { purgeIfRelic(it) }
              */
+
+            /**
+             * Purge each ingredient in a crafting recipe that was a relic.
+             */
+            @EventHandler
+            fun onCraft(event: CraftItemEvent) = event.inventory.matrix.forEach {
+                if (it != null) {
+                    purgeIfRelic(it)
+                }
+            }
 
             @EventHandler
             fun onBrewingStandFuel(event: BrewingStandFuelEvent) = purgeIfRelic(event.fuel)
@@ -191,8 +203,6 @@ class RelicItemStackIntegrator(instance: Plugin,
              * @param item The item stack to be checked and processed as a relic.
              */
             fun purgeIfRelic(item: ItemStack) {
-                Bukkit.broadcast(Component.text("Event fired!"))
-
                 if (!item.hasItemMeta()) {
                     return // The item was not a relic
                 }
