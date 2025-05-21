@@ -17,6 +17,9 @@ permissions:
   relics.register:
     description: Allows /relics register
     default: op
+  relics.claim:
+    description: Allows /relics claim
+    default: true
   relics.list:
     description: Allows /relics list
     default: true

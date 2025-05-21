@@ -1,12 +1,14 @@
 package net.williserver.relics.commands
 
 import net.williserver.relics.integration.item.RelicItemStackIntegrator
+import net.williserver.relics.integration.item.RelicItemStackIntegrator.Companion.itemInHand
 import net.williserver.relics.integration.messaging.sendErrorMessage
 import net.williserver.relics.model.Relic
 import net.williserver.relics.model.RelicRarity
 import net.williserver.relics.model.RelicSet
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import java.util.UUID
 
 /**
  * Functions to validate a single invocation of a command.
@@ -84,12 +86,26 @@ class RelicsCommandValidator(private val s: CommandSender,
      *
      * @return `true` if the held item is registered as a relic, otherwise `false`.
      * @throws IllegalArgumentException if the sender is not a player.
+     * @throws NullPointerException If no item is held -- check with SingleItemHeld first!
      */
     fun assertHeldItemIsRelic() =
         if (s !is Player) {
             throw IllegalArgumentException("This function should only be run by players -- this should have been checked earlier!")
-        } else if (!itemIntegrator.hasRelicMetadata(s.inventory.itemInMainHand)) {
+        } else if (!itemIntegrator.hasRelicMetadata(itemInHand(s)!!)) {
             sendErrorMessage(s, "This item is not a relic.")
+            false
+        } else true
+
+    /**
+     * Asserts that a given UUID is not equal to the sender's unique ID.
+     *
+     * @param otherId The UUID to validate against the sender's unique ID.
+     * @param errorMessage The error message to send to the sender if the UUID matches their own unique ID.
+     * @return `true` if the given UUID is not equal to the sender's unique ID, otherwise `false`.
+     */
+    fun assertUniqueIdIsNotSender(otherId: UUID?, errorMessage: String) =
+        if (s is Player && otherId != null && otherId == s.uniqueId) {
+            sendErrorMessage(s, errorMessage)
             false
         } else true
 

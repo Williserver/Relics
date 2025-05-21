@@ -46,6 +46,7 @@ class RelicsPlugin: JavaPlugin() {
         /* Core model listeners. */
         eventBus.registerListener(RelicEvent.REGISTER, RelicListenerType.MODEL, relicSet.constructRegisterListener())
         eventBus.registerListener(RelicEvent.DESTROY, RelicListenerType.MODEL, relicSet.constructDestroyListener())
+        eventBus.registerListener(RelicEvent.CLAIM, RelicListenerType.MODEL, relicSet.constructClaimListener())
 
         /* Integration listeners. */
         val integrator = RelicItemStackIntegrator(this, relicSet, eventBus)

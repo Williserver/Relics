@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.NamedTextColor
 import net.williserver.relics.integration.item.RelicItemStackIntegrator
+import net.williserver.relics.integration.item.RelicItemStackIntegrator.Companion.itemInHand
 import net.williserver.relics.integration.item.RelicItemStackIntegrator.Companion.itemName
 import net.williserver.relics.integration.messaging.prefixedMessage
 import net.williserver.relics.model.Relic
@@ -50,6 +51,7 @@ class RelicsCommand(
 
         val execute = RelicSubcommandExecutor(sender, args.drop(1), relicSet, bus, itemIntegrator)
         return when (subcommand) {
+            "claim" -> execute.claim()
             "deregister" -> execute.deregister()
             "help" -> execute.help()
             "info" -> execute.info()
@@ -99,7 +101,6 @@ private class RelicSubcommandExecutor(
     private val bus: RelicEventBus,
     private val itemIntegrator: RelicItemStackIntegrator
 ) {
-    // Create a validator for this sender.
     private val v = RelicsCommandValidator(s, relicSet, itemIntegrator)
 
     /**
@@ -120,7 +121,7 @@ private class RelicSubcommandExecutor(
         val register = generateCommandHelp("register [name]", "register the item that you're holding as a Relic.")
         s.sendMessage(header
             .append(deregister)
-            .append(help)
+            .append(help)    // Create a validator for this sender.
             .append(info)
             .append(list)
             .append(register)
@@ -128,41 +129,28 @@ private class RelicSubcommandExecutor(
         return true
     }
 
-    /**
-     * Validates the command sender, ensures they are holding a single item, and checks if the item's name is valid.
-     *
-     * This method performs the following checks in order:
-     * - Ensures the sender is a valid player.
-     * - Confirms the player is holding a single item in their hand.
-     * - Validates the display name of the item in the player's main hand.
-     *
-     * Each validation step sends an error message to the sender if the check fails.
-     *
-     * @return Whether the command was invoked with the correct number of arguments.
-     */
-    fun register(): Boolean {
-        // Argument structure validation. One arg: item rarity.
-        if (args.size != 1) {
+    fun claim(): Boolean {
+        // Argument structure validation. One implicit argument -- relic in hand.
+        if (args.isNotEmpty()) {
             return false
         }
 
         // Argument semantics validation.
+        // Sender is a player holding a Relic they don't already own.
         if (!v.assertValidPlayer()
             || !v.assertSingleItemHeld()
-            || !v.assertHeldItemValidMaterial()
-            || !v.assertHeldItemNotAlreadyRelic()
-            || !v.assertRarityValid(args[0])) {
+            || !v.assertHeldItemIsRelic()) {
+            return true
+        }
+        val heldItem = itemInHand(s as Player)!!
+        val relic = itemIntegrator.relicFromItem(heldItem)
+        val oldOwner = relicSet.ownerOf(relic)
+        if (!v.assertUniqueIdIsNotSender(oldOwner, "You already own this relic!")) {
             return true
         }
 
-        val item = (s as Player).inventory.itemInMainHand
-        val name = itemName(item)
-        if (!v.assertValidName(name) || !v.assertUniqueName(name)) {
-            return true
-        }
-
-        // Validation complete, fire event.
-        bus.fireEvent(RelicEvent.REGISTER, Relic(name, RelicRarity.rarityFromName(args[0])!!), s.uniqueId, item)
+        // Validation complete, claim item.
+        bus.fireEvent(RelicEvent.CLAIM, relic, s.uniqueId, heldItem)
         return true
     }
 
@@ -226,8 +214,46 @@ private class RelicSubcommandExecutor(
             // TODO: filter by owned by player, then by target, if applicable.
             // (ownerOf != null && (target == null || ownerOf == target)
             .fold(prefixedMessage(Component.text("All Relics:", NamedTextColor.GOLD)))
-                { message, relic -> message.append(relicEntry(relic)) }
+            { message, relic -> message.append(relicEntry(relic)) }
         )
+        return true
+    }
+
+    /**
+     * Validates the command sender, ensures they are holding a single item, and checks if the item's name is valid.
+     *
+     * This method performs the following checks in order:
+     * - Ensures the sender is a valid player.
+     * - Confirms the player is holding a single item in their hand.
+     * - Validates the display name of the item in the player's main hand.
+     *
+     * Each validation step sends an error message to the sender if the check fails.
+     *
+     * @return Whether the command was invoked with the correct number of arguments.
+     */
+    fun register(): Boolean {
+        // Argument structure validation. One arg: item rarity.
+        if (args.size != 1) {
+            return false
+        }
+
+        // Argument semantics validation.
+        if (!v.assertValidPlayer()
+            || !v.assertSingleItemHeld()
+            || !v.assertHeldItemValidMaterial()
+            || !v.assertHeldItemNotAlreadyRelic()
+            || !v.assertRarityValid(args[0])) {
+            return true
+        }
+
+        val item = (s as Player).inventory.itemInMainHand
+        val name = itemName(item)
+        if (!v.assertValidName(name) || !v.assertUniqueName(name)) {
+            return true
+        }
+
+        // Validation complete, fire event.
+        bus.fireEvent(RelicEvent.REGISTER, Relic(name, RelicRarity.rarityFromName(args[0])!!), s.uniqueId, item)
         return true
     }
 
