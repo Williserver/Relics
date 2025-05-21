@@ -18,7 +18,6 @@ import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
-import java.util.UUID
 
 /**
  * The RelicsCommand class represents a command related to relics.
@@ -53,6 +52,7 @@ class RelicsCommand(
 
         val execute = RelicSubcommandExecutor(sender, args.drop(1), relicSet, bus, itemIntegrator)
         return when (subcommand) {
+            "all" -> execute.all()
             "claim" -> execute.claim()
             "deregister" -> execute.deregister()
             "help" -> execute.help()
@@ -127,6 +127,19 @@ private class RelicSubcommandExecutor(
             .append(info)
             .append(list)
             .append(register)
+        )
+        return true
+    }
+
+    /**
+     * Report a list of all relics on the server to sender, whether they're owned or not.
+     */
+    fun all(): Boolean {
+        s.sendMessage(relicSet
+            .relics()
+            .sortedByDescending { it.rarity.ordinal }
+            .fold(prefixedMessage(Component.text("All Relics:", NamedTextColor.GOLD)))
+            { message, relic -> message.append(relicEntry(relic)) }
         )
         return true
     }
@@ -244,7 +257,7 @@ private class RelicSubcommandExecutor(
             .ownedRelics()
             .sortedByDescending { it.rarity.ordinal }
             .filter { target == null || relicSet.ownerOf(it) == target}
-            .fold(prefixedMessage(Component.text("All Claimed Relics:", NamedTextColor.GOLD)))
+            .fold(prefixedMessage(Component.text("Claimed Relics:", NamedTextColor.GOLD)))
                 { message, relic -> message.append(relicEntry(relic)) }
         )
         return true

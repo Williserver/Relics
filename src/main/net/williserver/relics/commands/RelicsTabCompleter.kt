@@ -37,7 +37,7 @@ class RelicsTabCompleter(val relicSet: RelicSet): TabCompleter {
         // Subcommand suggestions
         when (args.size) {
             1 -> {
-                completions.addAll(setOf("claim", "deregister", "info", "help", "list", "register"))
+                completions.addAll(setOf("all", "claim", "deregister", "info", "help", "list", "register"))
                 completions.removeAll{ !it.startsWith(args[0], ignoreCase = true) }
             }
             2 -> {
