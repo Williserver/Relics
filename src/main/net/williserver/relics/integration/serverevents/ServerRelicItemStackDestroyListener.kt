@@ -32,6 +32,8 @@ class ServerRelicItemStackDestroyListener(
     // TODO: spawn egg
     // TODO: redstone illegal
 
+    // TODO: arrows are destroyed when shot!
+
     /*
      * Listeners for various ways of destroying an item.
      */

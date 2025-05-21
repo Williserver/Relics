@@ -310,33 +310,40 @@ private class RelicSubcommandExecutor(
      */
 
     /**
-     * Attempts to retrieve a relic based on the implicit context or provided arguments.
+     * Retrieves a `Relic` instance based on the provided name arguments or the item held by the sender.
      *
-     * This function determines the relic in one of the following ways:
+     * This method evaluates the input arguments and determines the appropriate relic using the following logic:
      * - If no arguments are provided:
-     *   - Verifies the sender is a player and is holding a single item.
-     *   - Extracts the item's name from the player's held item and matches it against the relic set.
-     * - If one argument is provided:
-     *   - Converts underscores in the argument to spaces and searches for a matching relic name.
-     * - If more than one argument is provided:
-     *   - Returns null as no valid match can be determined.
+     *   1. Validates that the sender is a player.
+     *   2. Ensures the player is holding exactly one item.
+     *   3. Confirms the held item has relic metadata
+     *   4. Verifies that the relic's name corresponds to a tracked relic.
+     *   If all validations pass, the corresponding relic is returned. Otherwise, it returns `null`.
      *
-     * @return The corresponding relic if found, or null if no relic matches or input validation fails.
+     * - If one argument is supplied:
+     *   Converts the argument from underscore-separated to space-separated format, then finds and
+     *   retrieves the relic with the corresponding name, if it exists.
+     *   
+     * - If more than one argument is supplied:
+     *   Returns `null`, indicating ambiguity in input handling.
+     *
+     * @return The corresponding `Relic` instance if a valid relic is found through the given input or held item; otherwise, returns `null`.
      */
     private fun getRelicFromImplicitArgument() =
         when (args.size) {
             0 ->
                 if (!v.assertValidPlayer()
                     || !v.assertSingleItemHeld()
-                    // Nominal check used to ensure that the item is still a relic.
-                    || !v.assertNameRefersToRelic(nameWithoutRarity(itemName((s as Player).inventory.itemInMainHand)))
                     // Deep check used to ensure that this item has the metadata needed to guarantee relic status.
                     || !v.assertHeldItemIsRelic()) {
                     null
                 } else {
-                    // Use the metadata embedded in the itemStack to retrieve the relic.
-                    // This further complicates counterfeiting.
-                    itemIntegrator.relicFromItem(s.inventory.itemInMainHand)
+                    val relic = itemIntegrator.relicFromItem((s as Player).inventory.itemInMainHand)
+                    // Final shallow check ensures that a relic with this name is still tracked.
+                    // Using a manual /relic deregister, it's possible to have a Relic item refer to a no-longer existant relic
+                    if (v.assertNameRefersToRelic(relic.name)) {
+                        relic
+                    } else null
                 }
             1 ->
                 relicSet.relicNamed(underscoresToSpaces(args[0]))
