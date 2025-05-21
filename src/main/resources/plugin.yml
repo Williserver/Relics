@@ -23,6 +23,9 @@ permissions:
   relics.claim:
     description: Allows /relics claim
     default: true
+  relics.info:
+    description: Allows /relics info
+    default: true
   relics.list:
     description: Allows /relics list
     default: true

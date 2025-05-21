@@ -231,9 +231,10 @@ private class RelicSubcommandExecutor(
     }
 
     /**
-     * Sends a message to the command sender containing a formatted list of all relics.
+     * Sends a formatted list of claimed relics to the sender. Optionally filters
+     * by the specified player's relics if a name is provided as an argument.
      *
-     * @return `true` after successfully sending the list message.
+     * @return Whether the command was invoked with the correct number of arguments.
      */
     fun list(): Boolean {
         // Argument structure validation. One optional arg: name of player.
