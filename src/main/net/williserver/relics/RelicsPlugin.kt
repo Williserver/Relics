@@ -3,6 +3,7 @@ package net.williserver.relics
 import net.williserver.relics.commands.RelicsCommand
 import net.williserver.relics.commands.RelicsTabCompleter
 import net.williserver.relics.integration.item.RelicItemStackIntegrator
+import net.williserver.relics.serverevents.ServerRelicItemStackDestroyListener
 import net.williserver.relics.integration.messaging.constructRelicDestroyMessageListener
 import net.williserver.relics.integration.messaging.constructRelicRegisterMessageListener
 import net.williserver.relics.model.RelicSet
@@ -57,7 +58,7 @@ class RelicsPlugin: JavaPlugin() {
         logger.info("Finished registering relic lifecycle listeners.")
 
         /* Register in-game event listeners. */
-        server.pluginManager.registerEvents(integrator.constructRelicRemoveListener(), this)
+        server.pluginManager.registerEvents(ServerRelicItemStackDestroyListener(integrator), this)
 
         /* Register commands.*/
         getCommand("relics")!!.setExecutor(RelicsCommand(relicSet, eventBus, integrator))
