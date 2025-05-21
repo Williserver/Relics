@@ -26,8 +26,11 @@ import org.bukkit.event.inventory.BrewingStandFuelEvent
 import org.bukkit.event.inventory.CraftItemEvent
 import org.bukkit.event.inventory.FurnaceBurnEvent
 import org.bukkit.event.inventory.FurnaceSmeltEvent
+import org.bukkit.event.inventory.InventoryClickEvent
+import org.bukkit.event.inventory.PrepareAnvilEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemConsumeEvent
+import org.bukkit.inventory.AnvilInventory
 import org.bukkit.inventory.ItemStack
 
 /**
@@ -161,6 +164,29 @@ class RelicItemStackIntegrator(instance: Plugin,
             fun onCraft(event: CraftItemEvent) = event.inventory.matrix.forEach {
                 if (it != null) {
                     purgeIfRelic(it)
+                }
+            }
+
+            /**
+             * Destroy a Relic used as fuel for a repair.
+             *
+             * This fires when:
+             * - The third slot of an inventory is clicked
+             * - That slot has an item, meaning this is a valid repair
+             * - The second slot of the anvil, the fuel slot, has a Relic.
+             *
+             * If so, the Relic will be consumed and destroyed.
+             */
+            @EventHandler
+            fun onRelicInBottomAnvilSlotDestroy(event: InventoryClickEvent) {
+                val fuelSlot = 1
+                val resultSlot = 2
+
+                if (event.clickedInventory is AnvilInventory
+                    && event.slot == resultSlot
+                    && event.inventory.contents.none { it == null })
+                {
+                    purgeIfRelic(event.inventory.contents[fuelSlot]!!)
                 }
             }
 
