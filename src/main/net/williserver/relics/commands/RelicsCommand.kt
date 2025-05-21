@@ -323,7 +323,7 @@ private class RelicSubcommandExecutor(
      * - If one argument is supplied:
      *   Converts the argument from underscore-separated to space-separated format, then finds and
      *   retrieves the relic with the corresponding name, if it exists.
-     *   
+     *
      * - If more than one argument is supplied:
      *   Returns `null`, indicating ambiguity in input handling.
      *
@@ -345,8 +345,13 @@ private class RelicSubcommandExecutor(
                         relic
                     } else null
                 }
-            1 ->
-                relicSet.relicNamed(underscoresToSpaces(args[0]))
+            1 -> {
+                val formattedName = underscoresToSpaces(args[0])
+                // Ensure that error message is sent if no relic with that name.
+                v.assertNameRefersToRelic(formattedName)
+                relicSet.relicNamed(formattedName)
+            }
+
             else -> null
         }
 
