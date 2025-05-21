@@ -49,13 +49,10 @@ class RelicSet(private val relicsToOwner: MutableMap<Relic, SUUID> = mutableMapO
      * @param relic The relic to be claimed by the owner.
      * @param owner The UUID of the owner claiming the relic.
      * @throws IllegalArgumentException if the relic is not registered in the set.
-     * @throws IllegalArgumentException if the relic has already been claimed by another owner.
      */
     fun claim(relic: Relic, owner: UUID) =
         if (relic !in relics()) {
             throw IllegalArgumentException("$PLUGIN_MESSAGE_PREFIX: this relic has not been registered!")
-        } else if (relicsToOwner[relic] != null) {
-            throw IllegalArgumentException("$PLUGIN_MESSAGE_PREFIX: this relic has already been claimed!")
         } else {
             relicsToOwner[relic] = owner
         }
