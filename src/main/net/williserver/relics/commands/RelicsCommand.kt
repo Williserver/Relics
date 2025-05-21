@@ -181,12 +181,12 @@ private class RelicSubcommandExecutor(
         val relic = getRelicFromImplicitArgument()?: return true
         // If we have access to the item, include it in the deregister event!
         val item =
-            if (args.isEmpty()) {
-                (s as Player).inventory.itemInMainHand
-            } else null
+            if (args.isEmpty()) (s as Player).inventory.itemInMainHand else null
+        val agent =
+            if (s is Player) s.uniqueId else null
 
         // Validation complete, fire event.
-        bus.fireEvent(RelicEvent.DESTROY, relic, null, item)
+        bus.fireEvent(RelicEvent.DESTROY, relic, agent, item)
         return true
     }
 

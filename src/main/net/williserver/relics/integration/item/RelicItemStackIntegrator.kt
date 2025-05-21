@@ -96,7 +96,7 @@ class RelicItemStackIntegrator(instance: Plugin,
      * relic item stack to remove relic-specific metadata and reset the display name to its default state.
      *
      * Note that this listener also accepts a null item, in which case an item with relic metadata will still be present in the world.
-     * This item cannot, however, be considered a relic. TODO: prevent remote deregister.
+     * This item cannot, however, be considered a relic.
      *
      * @return A [RelicLifecycleListener] configured to handle the destruction of relic item stacks.
      * @throws IllegalArgumentException if the item stack size is not one, or if the item is not a valid relic.
