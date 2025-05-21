@@ -72,7 +72,7 @@ class RelicsCommandValidator(private val s: CommandSender,
     fun assertHeldItemNotAlreadyRelic() =
         if (s !is Player) {
             throw IllegalArgumentException("This function should only be run by players -- this should have been checked earlier!")
-        } else if (itemIntegrator.isRelic(s.inventory.itemInMainHand)) {
+        } else if (itemIntegrator.hasRelicMetadata(s.inventory.itemInMainHand)) {
             sendErrorMessage(s, "This item was already registered as a relic.")
             false
         } else true
@@ -88,7 +88,7 @@ class RelicsCommandValidator(private val s: CommandSender,
     fun assertHeldItemIsRelic() =
         if (s !is Player) {
             throw IllegalArgumentException("This function should only be run by players -- this should have been checked earlier!")
-        } else if (!itemIntegrator.isRelic(s.inventory.itemInMainHand)) {
+        } else if (!itemIntegrator.hasRelicMetadata(s.inventory.itemInMainHand)) {
             sendErrorMessage(s, "This item is not a relic.")
             false
         } else true

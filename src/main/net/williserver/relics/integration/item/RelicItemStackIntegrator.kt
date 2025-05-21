@@ -16,18 +16,14 @@ import org.bukkit.event.EventHandler
 import org.bukkit.persistence.PersistentDataType
 import org.bukkit.plugin.Plugin
 import org.bukkit.event.Listener
-import org.bukkit.event.enchantment.EnchantItemEvent
 import org.bukkit.event.entity.EntityDamageEvent
-import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.event.entity.ItemDespawnEvent
-import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.bukkit.event.inventory.BrewEvent
 import org.bukkit.event.inventory.BrewingStandFuelEvent
 import org.bukkit.event.inventory.CraftItemEvent
 import org.bukkit.event.inventory.FurnaceBurnEvent
 import org.bukkit.event.inventory.FurnaceSmeltEvent
 import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.event.inventory.PrepareAnvilEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.inventory.AnvilInventory
@@ -52,6 +48,32 @@ class RelicItemStackIntegrator(instance: Plugin,
      */
     private val relicKey = NamespacedKey(instance, "relicName")
 
+    /*
+     * Instance helpers
+     */
+
+    /**
+     * @param item The item stack to be checked for relic status.
+     * @return Whether the itemstack has relic metadata.
+     */
+    fun hasRelicMetadata(item: ItemStack) = item.itemMeta.persistentDataContainer.has(relicKey, PersistentDataType.STRING)
+
+    /**
+     * @param item The item stack from which relic metadata is to be retrieved.
+     * @return The string associated with the relic in the item's metadata, or null if no relic metadata exists.
+     */
+    fun relicFromItem(item: ItemStack): Relic {
+        if (!hasRelicMetadata(item)) {
+            throw IllegalArgumentException("Item is not a relic, this should have been caught earlier!")
+        }
+
+        return relicSet.relicNamed(item.itemMeta.persistentDataContainer.get(relicKey, PersistentDataType.STRING)!!)!!
+    }
+
+    /*
+     * Relic lifecycle listeners
+     */
+
     /**
      * @return A [RelicLifecycleListener] that processes and customizes the relic item stack's metadata.
      */
@@ -70,21 +92,31 @@ class RelicItemStackIntegrator(instance: Plugin,
     }
 
     /**
-     * @param item The item stack to be checked for relic status.
-     * @return Whether the itemstack has relic metadata.
+     * Constructs a lifecycle listener for destroying relic item stacks. When triggered, it processes the given
+     * relic item stack to remove relic-specific metadata and reset the display name to its default state.
+     *
+     * Note that this listener also accepts a null item, in which case an item with relic metadata will still be present in the world.
+     * This item cannot, however, be considered a relic. TODO: prevent remote deregister.
+     *
+     * @return A [RelicLifecycleListener] configured to handle the destruction of relic item stacks.
+     * @throws IllegalArgumentException if the item stack size is not one, or if the item is not a valid relic.
      */
-    fun isRelic(item: ItemStack) = item.itemMeta.persistentDataContainer.has(relicKey, PersistentDataType.STRING)
-
-    /**
-     * @param item The item stack from which relic metadata is to be retrieved.
-     * @return The string associated with the relic in the item's metadata, or null if no relic metadata exists.
-     */
-    fun relicFromItem(item: ItemStack): Relic {
-        if (!isRelic(item)) {
-            throw IllegalArgumentException("Item is not a relic, this should have been caught earlier!")
+    fun constructDestroyItemStackListener(): RelicLifecycleListener = { relic, creator, relicItem ->
+        Bukkit.broadcast(Component.text("Fired!"))
+        // Relic destroy can be invoked separately from an item.
+        if (relicItem != null) {
+            // But if it is invoked with an item, that item should be a Relic itemstack of size one.
+            if (relicItem.amount != 1) {
+                throw IllegalArgumentException("Relic itemstack should contain only one item!")
+            } else if (!hasRelicMetadata(relicItem)) {
+                throw IllegalArgumentException("Item is not a relic and should not have been passed to this listener!")
+            } else {
+                relicItem.editMeta {
+                    it.persistentDataContainer.remove(relicKey)
+                    it.setDisplayName("Shattered Relic")
+                }
+            }
         }
-
-        return relicSet.relicNamed(item.itemMeta.persistentDataContainer.get(relicKey, PersistentDataType.STRING)!!)!!
     }
 
     /*
@@ -239,7 +271,7 @@ class RelicItemStackIntegrator(instance: Plugin,
                     ?: return // The item is no longer registered as a relic -- this may happen if the listener fires multiple times for the same item.
 
                 // The item is a relic that has just been destroyed.
-                bus.fireEvent(RelicEvent.DESTROY, relic)
+                bus.fireEvent(RelicEvent.DESTROY, relic, item = item)
             }
         } // end server event listener
 } // end itemset integration

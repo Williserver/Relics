@@ -179,9 +179,14 @@ private class RelicSubcommandExecutor(
 
         // Argument semantics validation. Item held is a relic, or args[0] is a valid name.
         val relic = getRelicFromImplicitArgument()?: return true
+        // If we have access to the item, include it in the deregister event!
+        val item =
+            if (args.isEmpty()) {
+                (s as Player).inventory.itemInMainHand
+            } else null
 
         // Validation complete, fire event.
-        bus.fireEvent(RelicEvent.DESTROY, relic, null, null)
+        bus.fireEvent(RelicEvent.DESTROY, relic, null, item)
         return true
     }
 
