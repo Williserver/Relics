@@ -129,6 +129,19 @@ private class RelicSubcommandExecutor(
         return true
     }
 
+    /**
+     * Processes the claim command for a relic held by the invoking player.
+     *
+     * The method performs several validations to ensure that:
+     * - The command sender is a valid player.
+     * - The player is holding a single item.
+     * - The held item is a registered relic.
+     * - The relic is not already owned by the player.
+     *
+     * If all validations pass, the relic is claimed by the player, and a `CLAIM` event is triggered.
+     *
+     * @return Whether the command was invoked with the correct number of arguments.
+     */
     fun claim(): Boolean {
         // Argument structure validation. One implicit argument -- relic in hand.
         if (args.isNotEmpty()) {
