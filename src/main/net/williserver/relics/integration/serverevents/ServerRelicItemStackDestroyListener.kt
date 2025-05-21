@@ -1,4 +1,4 @@
-package net.williserver.relics.serverevents
+package net.williserver.relics.integration.serverevents
 
 import com.destroystokyo.paper.event.player.PlayerLaunchProjectileEvent
 import io.papermc.paper.event.block.CompostItemEvent

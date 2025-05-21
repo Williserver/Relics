@@ -3,7 +3,7 @@ package net.williserver.relics
 import net.williserver.relics.commands.RelicsCommand
 import net.williserver.relics.commands.RelicsTabCompleter
 import net.williserver.relics.integration.item.RelicItemStackIntegrator
-import net.williserver.relics.serverevents.ServerRelicItemStackDestroyListener
+import net.williserver.relics.integration.serverevents.ServerRelicItemStackDestroyListener
 import net.williserver.relics.integration.messaging.constructRelicDestroyMessageListener
 import net.williserver.relics.integration.messaging.constructRelicRegisterMessageListener
 import net.williserver.relics.model.RelicSet
