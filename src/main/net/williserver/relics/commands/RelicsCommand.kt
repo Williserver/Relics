@@ -139,7 +139,7 @@ private class RelicSubcommandExecutor(
             .relics()
             .sortedByDescending { it.rarity.ordinal }
             .fold(prefixedMessage(Component.text("All Relics:", NamedTextColor.GOLD)))
-            { message, relic -> message.append(relicEntry(relic)) }
+            { message, relic -> message.append(formatRelicEntry(relic)) }
         )
         return true
     }
@@ -224,7 +224,7 @@ private class RelicSubcommandExecutor(
         val relic = getRelicFromImplicitArgument() ?: return true
         // Prepare and send message.
         val message = prefixedMessage(Component.text("Relic Information:", NamedTextColor.GOLD))
-            .append(relicEntry(relic))
+            .append(formatRelicEntry(relic))
 
         s.sendMessage(message)
         return true
@@ -259,7 +259,7 @@ private class RelicSubcommandExecutor(
             .sortedByDescending { it.rarity.ordinal }
             .filter { target == null || relicSet.ownerOf(it) == target}
             .fold(prefixedMessage(Component.text("Claimed Relics:", NamedTextColor.GOLD)))
-                { message, relic -> message.append(relicEntry(relic)) }
+                { message, relic -> message.append(formatRelicEntry(relic)) }
         )
         return true
     }
@@ -310,21 +310,6 @@ private class RelicSubcommandExecutor(
      */
 
     /**
-     * Formats the ownership information of a relic if the relic has an associated owner.
-     *
-     * @param relic The relic for which ownership information is to be formatted. Must be a registered relic.
-     * @return A `TextComponent` containing the ownership information, or null if the relic has no owner.
-     */
-    private fun formatOwner(relic: Relic): TextComponent? =
-        relicSet.ownerOf(relic)?.let {
-            val name = Bukkit.getOfflinePlayer(it).name ?: it.toString()
-
-            Component.text(" (owned by ", NamedTextColor.GRAY)
-                .append(Component.text(name, NamedTextColor.YELLOW))
-                .append(Component.text(")", NamedTextColor.GRAY))
-        }
-
-    /**
      * Attempts to retrieve a relic based on the implicit context or provided arguments.
      *
      * This function determines the relic in one of the following ways:
@@ -358,14 +343,33 @@ private class RelicSubcommandExecutor(
             else -> null
         }
 
+    /*
+     * Message formatting helpers.
+     */
+
     /**
      * @param relic Relic to format
      * @return A component mapping the relic's formatting to its owner.
      */
-    private fun relicEntry(relic: Relic) =
+    private fun formatRelicEntry(relic: Relic) =
         Component.text("\n - ", NamedTextColor.RED)
         .append(relic.asDisplayComponent())
             .append(formatOwner(relic) ?: Component.text(" (unclaimed)", NamedTextColor.GRAY))
+
+    /**
+     * Formats the ownership information of a relic if the relic has an associated owner.
+     *
+     * @param relic The relic for which ownership information is to be formatted. Must be a registered relic.
+     * @return A `TextComponent` containing the ownership information, or null if the relic has no owner.
+     */
+    private fun formatOwner(relic: Relic): TextComponent? =
+        relicSet.ownerOf(relic)?.let {
+            val name = Bukkit.getOfflinePlayer(it).name ?: it.toString()
+
+            Component.text(" (owned by ", NamedTextColor.GRAY)
+                .append(Component.text(name, NamedTextColor.YELLOW))
+                .append(Component.text(")", NamedTextColor.GRAY))
+        }
 
 } // end relic subcommand executor
 } // end relics command
