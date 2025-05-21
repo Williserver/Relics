@@ -7,6 +7,7 @@ import net.williserver.relics.integration.item.RelicItemStackIntegrator
 import net.williserver.relics.integration.item.RelicItemStackIntegrator.Companion.itemInHand
 import net.williserver.relics.integration.item.RelicItemStackIntegrator.Companion.itemName
 import net.williserver.relics.integration.messaging.prefixedMessage
+import net.williserver.relics.integration.messaging.sendErrorMessage
 import net.williserver.relics.model.Relic
 import net.williserver.relics.model.RelicRarity
 import net.williserver.relics.model.RelicSet
@@ -17,6 +18,7 @@ import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import java.util.UUID
 
 /**
  * The RelicsCommand class represents a command related to relics.
@@ -221,13 +223,28 @@ private class RelicSubcommandExecutor(
      * @return `true` after successfully sending the list message.
      */
     fun list(): Boolean {
-        // TODO: pages
+        // Argument structure validation. One optional arg: name of player.
+        if (args.size > 1) {
+            return false
+        }
+
+        // Get the target player, if provided.
+        val target =
+            if (args.isNotEmpty()) {
+                Bukkit.getOfflinePlayer(args[0]).let {
+                    if (!it.hasPlayedBefore()) {
+                        sendErrorMessage(s, "The player you specified has never joined the server.")
+                        return true
+                    } else it.uniqueId
+                }
+            } else null
+
+        // Send a list of all claimed relics.
         s.sendMessage(relicSet
             .relics()
-            // TODO: filter by owned by player, then by target, if applicable.
-            // (ownerOf != null && (target == null || ownerOf == target)
-            .fold(prefixedMessage(Component.text("All Relics:", NamedTextColor.GOLD)))
-            { message, relic -> message.append(relicEntry(relic)) }
+            .filter { relicSet.ownerOf(it) != null && (target == null || relicSet.ownerOf(it) == target)}
+            .fold(prefixedMessage(Component.text("All Claimed Relics:", NamedTextColor.GOLD)))
+                { message, relic -> message.append(relicEntry(relic)) }
         )
         return true
     }
