@@ -103,6 +103,11 @@ class RelicSet(private val relicsToOwner: MutableMap<Relic, SUUID> = mutableMapO
      */
     fun relics() = relicsToOwner.keys.toSet()
 
+    /**
+     * @return an immutable set view of all relics owned by some player in this plugin.
+     */
+    fun ownedRelics() = relics().filter { ownerOf(it) != null }.toSet()
+
     /*
      * Listeners
      */

@@ -199,4 +199,19 @@ class RelicSetTest {
 
         assertThrows(IllegalArgumentException::class.java) { bus.fireEvent(RelicEvent.DESTROY, relic, UUID.randomUUID()) }
     }
+
+    @Test
+    fun testOwnedRelicsSet() {
+        val ownedRelic = Relic("I'm claimed", RelicRarity.Epic)
+        val unownedRelic = Relic("I'm not claimed", RelicRarity.Legendary)
+        val relicSet = RelicSet(mutableMapOf(Pair(ownedRelic, UUID.randomUUID()), Pair(unownedRelic, null)))
+
+        var ownedRelics = relicSet.ownedRelics()
+        assert(ownedRelic in ownedRelics)
+        assert(unownedRelic !in ownedRelics)
+
+        relicSet.claim(unownedRelic, UUID.randomUUID())
+        ownedRelics = relicSet.ownedRelics()
+        assert(unownedRelic in ownedRelics)
+    }
 }
