@@ -29,6 +29,8 @@ class ServerRelicItemStackDestroyListener(
     // TODO: use water
     // TODO: on enchant
     // TODO: on repair
+    // TODO: spawn egg
+    // TODO: redstone illegal
 
     /*
      * Listeners for various ways of destroying an item.

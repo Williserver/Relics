@@ -45,7 +45,7 @@ class RelicsTabCompleter(val relicSet: RelicSet): TabCompleter {
                     "register" ->
                         completions.addAll(setOf("common", "rare", "epic", "legendary", "unique"))
                     "deregister", "info" ->
-                        relicSet.relics().forEach { relic -> completions.add(spacesToUnderscores(relic.name)) }
+                        relicSet.ownedRelics().forEach { relic -> completions.add(spacesToUnderscores(relic.name)) }
                 }
                 completions.removeAll{ !it.startsWith(args[1], ignoreCase = true) }
             }

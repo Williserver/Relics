@@ -241,8 +241,9 @@ private class RelicSubcommandExecutor(
 
         // Send a list of all claimed relics.
         s.sendMessage(relicSet
-            .relics()
-            .filter { relicSet.ownerOf(it) != null && (target == null || relicSet.ownerOf(it) == target)}
+            .ownedRelics()
+            .sortedByDescending { it.rarity.ordinal }
+            .filter { target == null || relicSet.ownerOf(it) == target}
             .fold(prefixedMessage(Component.text("All Claimed Relics:", NamedTextColor.GOLD)))
                 { message, relic -> message.append(relicEntry(relic)) }
         )
@@ -286,16 +287,6 @@ private class RelicSubcommandExecutor(
         bus.fireEvent(RelicEvent.REGISTER, Relic(name, RelicRarity.rarityFromName(args[0])!!), s.uniqueId, item)
         return true
     }
-
-    // TODO: claim relic
-    // -- given an item in your hand, check if it's a relic
-    // -- if so, mark you as the new owner of the relic.
-
-    // Validate:
-    // -- Sender is player
-
-    // Report:
-    // -- Whether you claimed the relic or not.
 
     // TODO: top players
     // -- report a list of players, sorted by the value of the relics they own.
