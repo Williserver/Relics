@@ -27,6 +27,7 @@ class ServerRelicItemStackDestroyListener(
     private val integrator: RelicItemStackIntegrator
 ): Listener {
     // TODO: use water
+    // TODO: plant item
 
     /*
      * Listeners for various ways of destroying an item.
@@ -119,8 +120,8 @@ class ServerRelicItemStackDestroyListener(
     fun onPlayerConsumeItem(event: PlayerItemConsumeEvent) = integrator.purgeIfRelic(event.item)
 
     @EventHandler
-    fun onCompostItem(event: CompostItemEvent) = integrator.purgeIfRelic(event.item)
+    fun onPlayerDestroyItem(event: PlayerItemBreakEvent) = integrator.purgeIfRelic(event.brokenItem)
 
     @EventHandler
-    fun onPlayerDestroyItem(event: PlayerItemBreakEvent) = integrator.purgeIfRelic(event.brokenItem)
+    fun onCompostItem(event: CompostItemEvent) = integrator.purgeIfRelic(event.item)
 }

@@ -69,7 +69,14 @@ data class Relic(val name: String, val rarity: RelicRarity) {
             Material.WARDEN_SPAWN_EGG, Material.WITCH_SPAWN_EGG, Material.WITHER_SKELETON_SPAWN_EGG,
             Material.WOLF_SPAWN_EGG, Material.ZOGLIN_SPAWN_EGG, Material.ZOMBIE_SPAWN_EGG,
             Material.ZOMBIE_HORSE_SPAWN_EGG, Material.ZOMBIE_VILLAGER_SPAWN_EGG,
-            Material.ZOMBIFIED_PIGLIN_SPAWN_EGG
+            Material.ZOMBIFIED_PIGLIN_SPAWN_EGG,
+            // All buckets are illegal -- Spigot removes the item state too quickly!
+            // Exception: milk buckets (we catch the item consume event).
+            Material.BUCKET, Material.LAVA_BUCKET, Material.WATER_BUCKET,
+            Material.AXOLOTL_BUCKET, Material.SALMON_BUCKET, Material.TROPICAL_FISH_BUCKET,
+            Material.COD_BUCKET, Material.PUFFERFISH_BUCKET, Material.TADPOLE_BUCKET,
+            Material.LAVA_BUCKET, Material.POWDER_SNOW_BUCKET, Material.LEGACY_BUCKET,
+            Material.LEGACY_LAVA_BUCKET, Material.LEGACY_WATER_BUCKET
         )
 
         /**
