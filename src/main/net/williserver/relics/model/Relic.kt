@@ -27,8 +27,17 @@ data class Relic(val name: String, val rarity: RelicRarity) {
     companion object {
         /**
          * Set of specifically identified illegal materials.
+         *
+         * Arrows do not integrate with Relics.
+         * This is because they can be picked up after being shot, BUT the entity that is picked up isn't the same ItemStack.
+         * Rather, it's a copy of the arrow entity as it was when it was shot -- including the metadata that should have been deleted!
+         * As a result, we can end up with extraneous arrows.
          */
-        val ILLEGAL_MATERIALS = setOf(Material.STRUCTURE_VOID, Material.BARRIER, Material.REDSTONE)
+        val ILLEGAL_MATERIALS = setOf(
+            Material.STRUCTURE_VOID, Material.REDSTONE,
+            Material.ARROW, Material.SPECTRAL_ARROW, Material.TIPPED_ARROW,
+            Material.LEGACY_ARROW, Material.LEGACY_SPECTRAL_ARROW, Material.LEGACY_TIPPED_ARROW
+        )
 
         /**
          * Validates the name of a relic.

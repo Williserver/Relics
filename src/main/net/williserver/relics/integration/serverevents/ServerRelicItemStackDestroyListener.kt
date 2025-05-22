@@ -7,6 +7,7 @@ import org.bukkit.entity.Item
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
+import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.event.entity.ItemDespawnEvent
 import org.bukkit.event.inventory.BrewEvent
 import org.bukkit.event.inventory.BrewingStandFuelEvent
@@ -30,9 +31,6 @@ class ServerRelicItemStackDestroyListener(
     // TODO: on enchant
     // TODO: on repair
     // TODO: spawn egg
-    // TODO: redstone illegal
-
-    // TODO: arrows are destroyed when shot!
 
     /*
      * Listeners for various ways of destroying an item.
@@ -61,15 +59,7 @@ class ServerRelicItemStackDestroyListener(
     }
 
     @EventHandler
-    fun onProjectileLaunch(event: PlayerLaunchProjectileEvent) = integrator.purgeIfRelic(event.itemStack)
-
-    /*
-      A note on consumable arrows: these can be picked up again. If not, they'll be caught on despawn.
-      If I end up being wrong, here's a quick handler for deregistering arrows when you shoot them.
-
-    @EventHandler
     fun onArrowShoot(event: EntityShootBowEvent) = event.consumable?.let { integrator.purgeIfRelic(it) }
-     */
 
     /**
      * Purge each ingredient in a crafting recipe that was a relic.
