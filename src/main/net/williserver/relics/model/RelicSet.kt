@@ -14,7 +14,9 @@ import net.williserver.relics.session.RelicLifecycleListener
 import java.io.FileWriter
 import java.io.File
 import java.io.FileReader
+import java.util.SortedSet
 import java.util.UUID
+import kotlin.comparisons.compareByDescending
 
 /**
  * Represents a collection of relics and their ownership information. Provides functionality to register,
@@ -104,6 +106,17 @@ class RelicSet(private val relicsToOwner: MutableMap<Relic, SUUID> = mutableMapO
      * @return an immutable set view of all relics owned by some player in this plugin.
      */
     fun ownedRelics() = relics().filter { ownerOf(it) != null }.toSet()
+
+    /**
+     * @return A map of players to all the relics they own.
+     */
+    fun playersToOwnedRelics(): Map<UUID, UInt> =
+        ownedRelics()
+        .fold(mutableMapOf())
+            { sums, currentRelic ->
+                sums[ownerOf(currentRelic)!!] = sums.getOrDefault(ownerOf(currentRelic), 0u) + 1u
+                sums
+            }
 
     /*
      * Listeners

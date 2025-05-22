@@ -302,6 +302,17 @@ private class RelicSubcommandExecutor(
         return true
     }
 
+    fun top(): Boolean {
+        // Construct a table of owners to count
+        // For each relic
+        // - see its owner
+        // - add one to the owner sum
+        // Return the table sorted by sum
+
+
+        return false
+    }
+
     // TODO: top players
     // -- report a list of players, sorted by the value of the relics they own.
 
