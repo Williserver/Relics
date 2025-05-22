@@ -1,12 +1,10 @@
 package net.williserver.relics.integration.item
 
-import net.kyori.adventure.text.Component
 import net.williserver.relics.model.Relic
 import net.williserver.relics.model.RelicSet
 import net.williserver.relics.session.RelicEvent
 import net.williserver.relics.session.RelicEventBus
 import net.williserver.relics.session.RelicLifecycleListener
-import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player

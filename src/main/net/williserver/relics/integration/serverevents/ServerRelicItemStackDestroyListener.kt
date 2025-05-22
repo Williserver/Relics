@@ -1,13 +1,11 @@
 package net.williserver.relics.integration.serverevents
 
-import com.destroystokyo.paper.event.player.PlayerLaunchProjectileEvent
 import io.papermc.paper.event.block.CompostItemEvent
 import net.williserver.relics.integration.item.RelicItemStackIntegrator
 import org.bukkit.entity.Item
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
-import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.event.entity.ItemDespawnEvent
 import org.bukkit.event.inventory.BrewEvent
 import org.bukkit.event.inventory.BrewingStandFuelEvent
@@ -30,7 +28,6 @@ class ServerRelicItemStackDestroyListener(
     // TODO: use water
     // TODO: on enchant
     // TODO: on repair
-    // TODO: spawn egg
 
     /*
      * Listeners for various ways of destroying an item.
