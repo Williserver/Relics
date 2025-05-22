@@ -5,6 +5,7 @@ import net.williserver.relics.integration.item.RelicItemStackIntegrator
 import org.bukkit.entity.Item
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.enchantment.EnchantItemEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.ItemDespawnEvent
@@ -26,12 +27,19 @@ import org.bukkit.inventory.AnvilInventory
 class ServerRelicItemStackDestroyListener(
     private val integrator: RelicItemStackIntegrator
 ): Listener {
-    // TODO: use water
-    // TODO: plant item
-
     /*
      * Listeners for various ways of destroying an item.
      */
+
+    /**
+     * Relics cannot be placed!
+     */
+    @EventHandler
+    fun onBlockPlace(event: BlockPlaceEvent) = event.itemInHand.let {
+        if (integrator.hasRelicMetadata(it)) {
+            event.isCancelled = true
+        }
+    }
 
     /**
      * Listens for entity damage events and determines if the entity affected by the event

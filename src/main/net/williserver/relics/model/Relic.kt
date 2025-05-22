@@ -37,9 +37,9 @@ data class Relic(val name: String, val rarity: RelicRarity) {
          * It's not worth adding another complex listener for each different type of spawn egg.
          */
         val ILLEGAL_MATERIALS = setOf(
-            Material.STRUCTURE_VOID, Material.REDSTONE,
-            Material.ARROW, Material.SPECTRAL_ARROW, Material.TIPPED_ARROW,
+            Material.BARRIER, Material.STRUCTURE_VOID,
             // Arrows
+            Material.ARROW, Material.SPECTRAL_ARROW, Material.TIPPED_ARROW,
             Material.LEGACY_ARROW, Material.LEGACY_SPECTRAL_ARROW, Material.LEGACY_TIPPED_ARROW,
             // All spawn eggs are illegal!
             // NOTE: creaking spawn egg does not appear supported yet...?
@@ -96,7 +96,6 @@ data class Relic(val name: String, val rarity: RelicRarity) {
          */
         fun validMaterial(material: Material) =
             !material.isAir
-            && !material.isBlock
             && material !in ILLEGAL_MATERIALS
     }
 }
