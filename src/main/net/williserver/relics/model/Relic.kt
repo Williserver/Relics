@@ -2,39 +2,7 @@ package net.williserver.relics.model
 
 import kotlinx.serialization.Serializable
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.NamedTextColor
-import net.kyori.adventure.text.format.NamedTextColor.*
 import org.bukkit.Material
-
-/**
- * Relics are associated with a rarity.
- */
-@Serializable
-enum class RelicRarity(val color: NamedTextColor) {
-    Common(GRAY),
-    Rare(GREEN),
-    Epic(DARK_PURPLE),
-    Legendary(GOLD),
-    Unique(DARK_RED);
-
-    companion object {
-        /**
-         * Returns the corresponding `RelicRarity` enum value based on the given name. The match
-         * is case-insensitive. If the name does not match any predefined rarity, `null` is returned.
-         *
-         * @param name The name of the rarity to be translated into a `RelicRarity` enum value.
-         * @return The corresponding `RelicRarity` or `null` if no match is found.
-         */
-        fun rarityFromName(name: String) = when (name.lowercase()) {
-            "common" -> Common
-            "rare" -> Rare
-            "epic" -> Epic
-            "legendary" -> Legendary
-            "unique" -> Unique
-            else -> null
-        }
-    }
-}
 
 /**
  * A named relic.

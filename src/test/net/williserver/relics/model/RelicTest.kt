@@ -1,5 +1,6 @@
 package net.williserver.relics.model
 
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
 import java.lang.IllegalArgumentException
 import kotlin.test.Test
