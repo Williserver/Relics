@@ -27,7 +27,6 @@ class ServerRelicItemStackDestroyListener(
 ): Listener {
     // TODO: use water
     // TODO: on enchant
-    // TODO: on repair
 
     /*
      * Listeners for various ways of destroying an item.
