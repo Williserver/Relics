@@ -37,13 +37,14 @@ class RelicsTabCompleter(val relicSet: RelicSet): TabCompleter {
         // Subcommand suggestions
         when (args.size) {
             1 -> {
-                completions.addAll(setOf("all", "claim", "deregister", "info", "help", "list", "register"))
+                completions.addAll(setOf("all", "claim", "deregister", "info", "help", "list", "register", "top"))
                 completions.removeAll{ !it.startsWith(args[0], ignoreCase = true) }
             }
             2 -> {
                 when (args[0].lowercase()) {
                     "register" ->
                         completions.addAll(setOf("common", "rare", "epic", "legendary", "unique"))
+                    // Do not suggest unowned relics that have not yet been found!
                     "deregister", "info" ->
                         relicSet.ownedRelics().forEach { relic -> completions.add(spacesToUnderscores(relic.name)) }
                 }

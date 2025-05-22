@@ -59,6 +59,7 @@ class RelicsCommand(
             "info" -> execute.info()
             "register" -> execute.register()
             "list" -> execute.list()
+            "top" -> execute.top()
             else -> false
         }
     }
@@ -116,17 +117,16 @@ private class RelicSubcommandExecutor(
         fun generateCommandHelp(name: String, text: String)
             = bullet.append(Component.text("$name: ", NamedTextColor.RED).append(Component.text(text, NamedTextColor.GRAY)))
 
-        val deregister = generateCommandHelp("deregister [name]", "manually deregister a relic by name")
         val help = generateCommandHelp("help", "pull up this help menu")
         val info = generateCommandHelp("info [name]", "get information about a specific relic by name")
         val list = generateCommandHelp("list", "list all relics")
-        val register = generateCommandHelp("register [name]", "register the item that you're holding as a Relic.")
+        val top = generateCommandHelp("top", "list a ranking of players by the number of relic points they have.")
+
         s.sendMessage(header
-            .append(deregister)
-            .append(help)    // Create a validator for this sender.
+            .append(help)
             .append(info)
             .append(list)
-            .append(register)
+            .append(top)
         )
         return true
     }
@@ -302,19 +302,28 @@ private class RelicSubcommandExecutor(
         return true
     }
 
+    /**
+     * Send a message of the top players by relic points.
+     * @return true after successfully sending the message.
+     */
     fun top(): Boolean {
-        // Construct a table of owners to count
-        // For each relic
-        // - see its owner
-        // - add one to the owner sum
-        // Return the table sorted by sum
+        val formattedOwnersByPoints =
+            relicSet
+            .playersToRelicPoints()
+            .map { (Bukkit.getOfflinePlayer(it.key).name ?: "Unknown") to it.value }
+            .sortedByDescending { it.second }
+            .fold(prefixedMessage(Component.text("Top Players:", NamedTextColor.RED)))
+            { acc, (name, points) ->
+                acc.append(
+                    Component.text("\n - ", NamedTextColor.RED)
+                        .append(Component.text(name, NamedTextColor.YELLOW))
+                        .append(Component.text(" ($points points)", NamedTextColor.GRAY))
+                )
+            }
 
-
-        return false
+        s.sendMessage(formattedOwnersByPoints)
+        return true
     }
-
-    // TODO: top players
-    // -- report a list of players, sorted by the value of the relics they own.
 
     /*
      * Internal instance-specific helpers
