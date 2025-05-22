@@ -25,11 +25,11 @@ enum class RelicRarity(val color: NamedTextColor) {
      * Points expand in a Fibonnaci sequence.
      */
     fun points() = when (this) {
-        Common -> 1
-        Rare -> 2
-        Epic -> 3
-        Legendary -> 5
-        Unique -> 8
+        Common -> 1u
+        Rare -> 2u
+        Epic -> 3u
+        Legendary -> 5u
+        Unique -> 8u
     }
 
     companion object {

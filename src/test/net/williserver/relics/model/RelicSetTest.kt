@@ -245,30 +245,37 @@ class RelicSetTest {
      * - A player with no claimed relics has no entry in the ownership mapping.
      */
     @Test
-    fun testOwnedRelicsByPlayers() {
-        val playerWithTwoRelics = UUID.randomUUID()
-        val playerWithOneRelic = UUID.randomUUID()
-        val playerWithNoRelics = UUID.randomUUID()
+    fun testRelicPointsByPlayer() {
+        // Top dog has a single relic worth 8 points.
+        val topDog = UUID.randomUUID()
+        // Second fiddle has a relic worth three points, a relic worth two points, and a relic worth one point.
+        val secondFiddle = UUID.randomUUID()
+        // Last place has a relic worth five points.
+        val lastPlace = UUID.randomUUID()
 
-        val twoRelicFirst = Relic("I'm claimed", RelicRarity.Epic)
-        val twoRelicSecond = Relic("I'm also claimed", RelicRarity.Epic)
-        val oneRelic = Relic("I'm claimed too", RelicRarity.Legendary)
-        val unownedRelic = Relic("I'm not claimed", RelicRarity.Legendary)
+        val onePointer = Relic("Worth one point", RelicRarity.Common)
+        val twoPointer = Relic("Worth two points", RelicRarity.Rare)
+        val threePointer = Relic("Worth three points", RelicRarity.Epic)
+        val fivePointer = Relic("Worth five points", RelicRarity.Legendary)
+        val eightPointer = Relic("Worth eight points", RelicRarity.Unique)
 
         val relicSet = RelicSet(mutableMapOf())
 
-        relicSet.register(twoRelicFirst)
-        relicSet.register(twoRelicSecond)
-        relicSet.register(oneRelic)
-        relicSet.register(unownedRelic)
+        relicSet.register(onePointer)
+        relicSet.register(twoPointer)
+        relicSet.register(threePointer)
+        relicSet.register(fivePointer)
+        relicSet.register(eightPointer)
 
-        relicSet.claim(twoRelicFirst, playerWithTwoRelics)
-        relicSet.claim(twoRelicSecond, playerWithTwoRelics)
-        relicSet.claim(oneRelic, playerWithOneRelic)
+        relicSet.claim(eightPointer, topDog)
+        relicSet.claim(onePointer, secondFiddle)
+        relicSet.claim(twoPointer, secondFiddle)
+        relicSet.claim(threePointer, secondFiddle)
+        relicSet.claim(fivePointer, lastPlace)
 
-        val playersByOwnedRelics = relicSet.playersToOwnedRelics()
-        assertEquals(2u, playersByOwnedRelics[playerWithTwoRelics])
-        assertEquals(1u, playersByOwnedRelics[playerWithOneRelic])
-        assertEquals(null, playersByOwnedRelics[playerWithNoRelics])
+        val pointsPerPlayer = relicSet.playersToRelicPoints()
+        assertEquals(8u, pointsPerPlayer[topDog])
+        assertEquals(6u, pointsPerPlayer[secondFiddle])
+        assertEquals(5u, pointsPerPlayer[lastPlace])
     }
 }

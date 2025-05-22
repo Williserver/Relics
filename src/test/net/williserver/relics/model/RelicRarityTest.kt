@@ -9,10 +9,10 @@ import kotlin.test.Test
 class RelicRarityTest {
     @Test
     fun testRarityPoints() {
-        assertEquals(1, RelicRarity.Common.points())
-        assertEquals(2, RelicRarity.Rare.points())
-        assertEquals(3, RelicRarity.Epic.points())
-        assertEquals(5, RelicRarity.Legendary.points())
-        assertEquals(8, RelicRarity.Unique.points())
+        assertEquals(1u, RelicRarity.Common.points())
+        assertEquals(2u, RelicRarity.Rare.points())
+        assertEquals(3u, RelicRarity.Epic.points())
+        assertEquals(5u, RelicRarity.Legendary.points())
+        assertEquals(8u, RelicRarity.Unique.points())
     }
 }

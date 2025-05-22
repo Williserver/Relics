@@ -108,13 +108,13 @@ class RelicSet(private val relicsToOwner: MutableMap<Relic, SUUID> = mutableMapO
     fun ownedRelics() = relics().filter { ownerOf(it) != null }.toSet()
 
     /**
-     * @return A map of players to all the relics they own.
+     * @return A map of players to the point total of all the relics they own.
      */
-    fun playersToOwnedRelics(): Map<UUID, UInt> =
+    fun playersToRelicPoints(): Map<UUID, UInt> =
         ownedRelics()
         .fold(mutableMapOf())
             { sums, currentRelic ->
-                sums[ownerOf(currentRelic)!!] = sums.getOrDefault(ownerOf(currentRelic), 0u) + 1u
+                sums[ownerOf(currentRelic)!!] = sums.getOrDefault(ownerOf(currentRelic), 0u) + currentRelic.rarity.points()
                 sums
             }
 
