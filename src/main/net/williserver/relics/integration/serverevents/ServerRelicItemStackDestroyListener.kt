@@ -1,7 +1,10 @@
 package net.williserver.relics.integration.serverevents
 
 import io.papermc.paper.event.block.CompostItemEvent
+import io.papermc.paper.event.player.PlayerTradeEvent
+import net.kyori.adventure.text.Component
 import net.williserver.relics.integration.item.RelicItemStackIntegrator
+import org.bukkit.Bukkit
 import org.bukkit.entity.Item
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -15,9 +18,11 @@ import org.bukkit.event.inventory.CraftItemEvent
 import org.bukkit.event.inventory.FurnaceBurnEvent
 import org.bukkit.event.inventory.FurnaceSmeltEvent
 import org.bukkit.event.inventory.InventoryClickEvent
+import org.bukkit.event.inventory.InventoryType
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.inventory.AnvilInventory
+import org.bukkit.inventory.MerchantInventory
 
 /**
  * Listener to handle the destruction of Relic-based item stacks across various game events.
@@ -85,14 +90,39 @@ class ServerRelicItemStackDestroyListener(
      */
     @EventHandler
     fun onRelicInBottomAnvilSlotDestroy(event: InventoryClickEvent) {
+        if (event.clickedInventory !is AnvilInventory) return
+
         val fuelSlot = 1
         val resultSlot = 2
 
-        if (event.clickedInventory is AnvilInventory
-            && event.slot == resultSlot
-            && event.inventory.contents.none { it == null }
-        ) {
+        // If we're completing an anvil transaction WITH THE RELIC AS FUEL, destroy it.
+        if (event.slot == resultSlot
+            && event.inventory.contents.none { it == null }) {
             integrator.purgeIfRelic(event.inventory.contents[fuelSlot]!!)
+        }
+    }
+
+    /**
+     * Refuse to allow clicking a Relic over to a different inventory.
+     */
+    @EventHandler
+    fun checkMoveRelicAcceptableInventory(event: InventoryClickEvent) {
+        // Ignore clicks on empty slots.
+        if (event.clickedInventory == null) return
+
+        // It is always OK to move items between acceptable inventories.
+        val acceptableInventories = setOf(
+            InventoryType.PLAYER,
+            InventoryType.CHEST,
+            InventoryType.ENDER_CHEST,
+            InventoryType.ANVIL,
+            InventoryType.ENCHANTING
+        )
+        if (event.clickedInventory!!.type in acceptableInventories) return
+
+        // Otherwise, check that we haven't placed a relic in an unacceptable inventory.
+        if (event.cursor.hasItemMeta() && integrator.hasRelicMetadata(event.cursor)) {
+            event.isCancelled = true
         }
     }
 
@@ -115,6 +145,9 @@ class ServerRelicItemStackDestroyListener(
         }
     }
 
+    /*
+     * Even preventing directly placing items in here, it's still possible to use hoppers to get to the target.
+     */
     @EventHandler
     fun onFurnaceSmelt(event: FurnaceSmeltEvent) = integrator.purgeIfRelic(event.source)
 
