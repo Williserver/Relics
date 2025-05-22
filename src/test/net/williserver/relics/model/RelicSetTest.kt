@@ -231,18 +231,15 @@ class RelicSetTest {
     }
 
     /**
-     * Tests the functionality of associating relics with players and verifying ownership mappings.
+     * Verifies the correct calculation of relic points grouped by players in a `RelicSet`.
      *
-     * This test ensures that:
-     * - Players can claim multiple relics, and the count of owned relics is accurately tracked.
-     * - Players with no claimed relics are not included in the ownership mapping.
-     * - The number of relics claimed by each player is correctly reflected in the output of
-     *   the `playersToOwnedRelics` method of the `RelicSet` class.
+     * The test involves:
+     * - Setting up a `RelicSet` with multiple relics of varying point values.
+     * - Assigning these relics to different players using the `claim` method.
+     * - Calculating the total relic points for each player using the `playersToRelicPoints` method.
      *
      * Assertions:
-     * - The player who claims two relics is correctly associated with a count of `2` relics.
-     * - The player who claims one relic is correctly associated with a count of `1` relic.
-     * - A player with no claimed relics has no entry in the ownership mapping.
+     * - Ensures that the calculated points per player are accurate based on the assigned relics and their point values.
      */
     @Test
     fun testRelicPointsByPlayer() {
