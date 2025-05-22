@@ -77,11 +77,6 @@ class RelicsCommand(
          * @return the name with spaces replaced by underscores.
          */
         fun spacesToUnderscores(name: String) = name.replace(" ", "_")
-
-        /**
-         * @return An item name with starting rarity string removed.
-         */
-        fun nameWithoutRarity(name: String) = name.replaceBefore(" ", "").trimStart()
     } // End static helpers
 
 /**

@@ -26,6 +26,11 @@ data class Relic(val name: String, val rarity: RelicRarity) {
 
     companion object {
         /**
+         * Set of specifically identified illegal materials.
+         */
+        val ILLEGAL_MATERIALS = setOf(Material.STRUCTURE_VOID, Material.BARRIER, Material.REDSTONE)
+
+        /**
          * Validates the name of a relic.
          * A relic must start with a non-whitespace character.
          *
@@ -41,6 +46,8 @@ data class Relic(val name: String, val rarity: RelicRarity) {
          * @return Whether the material is valid
          */
         fun validMaterial(material: Material) =
-            !material.isAir && !material.isBlock
+            !material.isAir
+            && !material.isBlock
+            && material !in ILLEGAL_MATERIALS
     }
 }
