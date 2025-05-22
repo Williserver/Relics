@@ -58,9 +58,6 @@ class ServerRelicItemStackDestroyListener(
          */
     }
 
-    @EventHandler
-    fun onArrowShoot(event: EntityShootBowEvent) = event.consumable?.let { integrator.purgeIfRelic(it) }
-
     /**
      * Purge each ingredient in a crafting recipe that was a relic.
      */
