@@ -5,6 +5,7 @@ import net.williserver.relics.integration.item.RelicItemStackIntegrator
 import org.bukkit.entity.Item
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.enchantment.EnchantItemEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.ItemDespawnEvent
 import org.bukkit.event.inventory.BrewEvent
@@ -26,7 +27,6 @@ class ServerRelicItemStackDestroyListener(
     private val integrator: RelicItemStackIntegrator
 ): Listener {
     // TODO: use water
-    // TODO: on enchant
 
     /*
      * Listeners for various ways of destroying an item.
@@ -86,6 +86,13 @@ class ServerRelicItemStackDestroyListener(
             integrator.purgeIfRelic(event.inventory.contents[fuelSlot]!!)
         }
     }
+
+    /*
+     * Destroy the fuel in an enchantment table if it's a relic.
+     * Note that this will be in the second slot -- the first one is the target, which, when enchanted, retains its metadata.
+     */
+    @EventHandler
+    fun onEnchant(event: EnchantItemEvent) = event.inventory.contents[1]?.let { integrator.purgeIfRelic(it) }
 
     @EventHandler
     fun onBrewingStandFuel(event: BrewingStandFuelEvent) = integrator.purgeIfRelic(event.fuel)
