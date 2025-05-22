@@ -90,8 +90,8 @@ class ServerRelicItemStackDestroyListener(
 
         if (event.clickedInventory is AnvilInventory
             && event.slot == resultSlot
-            && event.inventory.contents.none { it == null })
-        {
+            && event.inventory.contents.none { it == null }
+        ) {
             integrator.purgeIfRelic(event.inventory.contents[fuelSlot]!!)
         }
     }

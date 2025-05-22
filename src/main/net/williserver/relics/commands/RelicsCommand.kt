@@ -133,7 +133,7 @@ private class RelicSubcommandExecutor(
         s.sendMessage(relicSet
             .relics()
             .sortedByDescending { it.rarity.ordinal }
-            .fold(prefixedMessage(Component.text("All Relics:", NamedTextColor.GOLD)))
+            .fold(prefixedMessage(Component.text("All Relics:", NamedTextColor.RED)))
             { message, relic -> message.append(formatRelicEntry(relic)) }
         )
         return true
@@ -218,7 +218,7 @@ private class RelicSubcommandExecutor(
         // Argument semantics validation. Item held is a relic, or args[0] is a valid name.
         val relic = getRelicFromImplicitArgument() ?: return true
         // Prepare and send message.
-        val message = prefixedMessage(Component.text("Relic Information:", NamedTextColor.GOLD))
+        val message = prefixedMessage(Component.text("Relic Information:", NamedTextColor.RED))
             .append(formatRelicEntry(relic))
 
         s.sendMessage(message)
@@ -253,7 +253,7 @@ private class RelicSubcommandExecutor(
             .ownedRelics()
             .sortedByDescending { it.rarity.ordinal }
             .filter { target == null || relicSet.ownerOf(it) == target}
-            .fold(prefixedMessage(Component.text("Claimed Relics:", NamedTextColor.GOLD)))
+            .fold(prefixedMessage(Component.text("Claimed Relics:", NamedTextColor.RED)))
                 { message, relic -> message.append(formatRelicEntry(relic)) }
         )
         return true
