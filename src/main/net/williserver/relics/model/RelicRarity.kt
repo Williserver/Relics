@@ -20,7 +20,6 @@ enum class RelicRarity(val color: NamedTextColor) {
     Legendary(GOLD),
     Unique(DARK_RED);
 
-
     /**
      * @return the number of points associated with this rarity.
      * Points expand in a Fibonnaci sequence.
