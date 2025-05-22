@@ -3,6 +3,7 @@ package net.williserver.relics.model
 import kotlinx.serialization.Serializable
 import net.kyori.adventure.text.Component
 import org.bukkit.Material
+import org.bukkit.Material.*
 
 /**
  * A named relic.
@@ -37,46 +38,46 @@ data class Relic(val name: String, val rarity: RelicRarity) {
          * It's not worth adding another complex listener for each different type of spawn egg.
          */
         val ILLEGAL_MATERIALS = setOf(
-            Material.BARRIER, Material.STRUCTURE_VOID,
+            BARRIER, STRUCTURE_VOID,
             // Arrows
-            Material.ARROW, Material.SPECTRAL_ARROW, Material.TIPPED_ARROW,
-            Material.LEGACY_ARROW, Material.LEGACY_SPECTRAL_ARROW, Material.LEGACY_TIPPED_ARROW,
+            ARROW, SPECTRAL_ARROW, TIPPED_ARROW,
+            LEGACY_ARROW, LEGACY_SPECTRAL_ARROW, LEGACY_TIPPED_ARROW,
             // All spawn eggs are illegal!
             // NOTE: creaking spawn egg does not appear supported yet...?
-            Material.ALLAY_SPAWN_EGG, Material.ARMADILLO_SPAWN_EGG, Material.AXOLOTL_SPAWN_EGG,
-            Material.BAT_SPAWN_EGG, Material.BEE_SPAWN_EGG, Material.BOGGED_SPAWN_EGG,
-            Material.BLAZE_SPAWN_EGG, Material.BREEZE_SPAWN_EGG, Material.CAT_SPAWN_EGG,
-            Material.CAVE_SPIDER_SPAWN_EGG, Material.CHICKEN_SPAWN_EGG, Material.COD_SPAWN_EGG,
-            Material.COW_SPAWN_EGG, Material.CREEPER_SPAWN_EGG, Material.DOLPHIN_SPAWN_EGG,
-            Material.DONKEY_SPAWN_EGG, Material.DROWNED_SPAWN_EGG, Material.ELDER_GUARDIAN_SPAWN_EGG,
-            Material.ENDERMAN_SPAWN_EGG, Material.ENDERMITE_SPAWN_EGG, Material.EVOKER_SPAWN_EGG,
-            Material.FOX_SPAWN_EGG, Material.FROG_SPAWN_EGG, Material.GHAST_SPAWN_EGG,
-            Material.GLOW_SQUID_SPAWN_EGG, Material.GUARDIAN_SPAWN_EGG,
-            Material.HOGLIN_SPAWN_EGG, Material.HORSE_SPAWN_EGG, Material.HUSK_SPAWN_EGG,
-            Material.IRON_GOLEM_SPAWN_EGG, Material.LLAMA_SPAWN_EGG, Material.MAGMA_CUBE_SPAWN_EGG,
-            Material.MOOSHROOM_SPAWN_EGG,Material.MULE_SPAWN_EGG, Material.OCELOT_SPAWN_EGG,
-            Material.PANDA_SPAWN_EGG, Material.PARROT_SPAWN_EGG, Material.PHANTOM_SPAWN_EGG,
-            Material.PIG_SPAWN_EGG, Material.PIGLIN_SPAWN_EGG, Material.PIGLIN_BRUTE_SPAWN_EGG,
-            Material.PILLAGER_SPAWN_EGG, Material.POLAR_BEAR_SPAWN_EGG,
-            Material.PUFFERFISH_SPAWN_EGG, Material.RABBIT_SPAWN_EGG, Material.RAVAGER_SPAWN_EGG,
-            Material.SALMON_SPAWN_EGG, Material.SHEEP_SPAWN_EGG, Material.SHULKER_SPAWN_EGG,
-            Material.SILVERFISH_SPAWN_EGG, Material.SKELETON_SPAWN_EGG, Material.SKELETON_HORSE_SPAWN_EGG,
-            Material.SLIME_SPAWN_EGG, Material.SNIFFER_SPAWN_EGG, Material.SNOW_GOLEM_SPAWN_EGG,
-            Material.SPIDER_SPAWN_EGG, Material.SQUID_SPAWN_EGG, Material.STRAY_SPAWN_EGG,
-            Material.STRIDER_SPAWN_EGG, Material.TADPOLE_SPAWN_EGG, Material.TRADER_LLAMA_SPAWN_EGG,
-            Material.TROPICAL_FISH_SPAWN_EGG, Material.TURTLE_SPAWN_EGG, Material.VEX_SPAWN_EGG,
-            Material.VILLAGER_SPAWN_EGG, Material.VINDICATOR_SPAWN_EGG, Material.WANDERING_TRADER_SPAWN_EGG,
-            Material.WARDEN_SPAWN_EGG, Material.WITCH_SPAWN_EGG, Material.WITHER_SKELETON_SPAWN_EGG,
-            Material.WOLF_SPAWN_EGG, Material.ZOGLIN_SPAWN_EGG, Material.ZOMBIE_SPAWN_EGG,
-            Material.ZOMBIE_HORSE_SPAWN_EGG, Material.ZOMBIE_VILLAGER_SPAWN_EGG,
-            Material.ZOMBIFIED_PIGLIN_SPAWN_EGG,
+            ALLAY_SPAWN_EGG, ARMADILLO_SPAWN_EGG, AXOLOTL_SPAWN_EGG,
+            BAT_SPAWN_EGG, BEE_SPAWN_EGG, BOGGED_SPAWN_EGG,
+            BLAZE_SPAWN_EGG, BREEZE_SPAWN_EGG, CAT_SPAWN_EGG,
+            CAVE_SPIDER_SPAWN_EGG, CHICKEN_SPAWN_EGG, COD_SPAWN_EGG,
+            COW_SPAWN_EGG, CREEPER_SPAWN_EGG, DOLPHIN_SPAWN_EGG,
+            DONKEY_SPAWN_EGG, DROWNED_SPAWN_EGG, ELDER_GUARDIAN_SPAWN_EGG,
+            ENDERMAN_SPAWN_EGG, ENDERMITE_SPAWN_EGG, EVOKER_SPAWN_EGG,
+            FOX_SPAWN_EGG, FROG_SPAWN_EGG, GHAST_SPAWN_EGG,
+            GLOW_SQUID_SPAWN_EGG, GUARDIAN_SPAWN_EGG,
+            HOGLIN_SPAWN_EGG, HORSE_SPAWN_EGG, HUSK_SPAWN_EGG,
+            IRON_GOLEM_SPAWN_EGG, LLAMA_SPAWN_EGG, MAGMA_CUBE_SPAWN_EGG,
+            MOOSHROOM_SPAWN_EGG,MULE_SPAWN_EGG, OCELOT_SPAWN_EGG,
+            PANDA_SPAWN_EGG, PARROT_SPAWN_EGG, PHANTOM_SPAWN_EGG,
+            PIG_SPAWN_EGG, PIGLIN_SPAWN_EGG, PIGLIN_BRUTE_SPAWN_EGG,
+            PILLAGER_SPAWN_EGG, POLAR_BEAR_SPAWN_EGG,
+            PUFFERFISH_SPAWN_EGG, RABBIT_SPAWN_EGG, RAVAGER_SPAWN_EGG,
+            SALMON_SPAWN_EGG, SHEEP_SPAWN_EGG, SHULKER_SPAWN_EGG,
+            SILVERFISH_SPAWN_EGG, SKELETON_SPAWN_EGG, SKELETON_HORSE_SPAWN_EGG,
+            SLIME_SPAWN_EGG, SNIFFER_SPAWN_EGG, SNOW_GOLEM_SPAWN_EGG,
+            SPIDER_SPAWN_EGG, SQUID_SPAWN_EGG, STRAY_SPAWN_EGG,
+            STRIDER_SPAWN_EGG, TADPOLE_SPAWN_EGG, TRADER_LLAMA_SPAWN_EGG,
+            TROPICAL_FISH_SPAWN_EGG, TURTLE_SPAWN_EGG, VEX_SPAWN_EGG,
+            VILLAGER_SPAWN_EGG, VINDICATOR_SPAWN_EGG, WANDERING_TRADER_SPAWN_EGG,
+            WARDEN_SPAWN_EGG, WITCH_SPAWN_EGG, WITHER_SKELETON_SPAWN_EGG,
+            WOLF_SPAWN_EGG, ZOGLIN_SPAWN_EGG, ZOMBIE_SPAWN_EGG,
+            ZOMBIE_HORSE_SPAWN_EGG, ZOMBIE_VILLAGER_SPAWN_EGG,
+            ZOMBIFIED_PIGLIN_SPAWN_EGG,
             // All buckets are illegal -- Spigot removes the item state too quickly!
             // Exception: milk buckets (we catch the item consume event).
-            Material.BUCKET, Material.LAVA_BUCKET, Material.WATER_BUCKET,
-            Material.AXOLOTL_BUCKET, Material.SALMON_BUCKET, Material.TROPICAL_FISH_BUCKET,
-            Material.COD_BUCKET, Material.PUFFERFISH_BUCKET, Material.TADPOLE_BUCKET,
-            Material.LAVA_BUCKET, Material.POWDER_SNOW_BUCKET, Material.LEGACY_BUCKET,
-            Material.LEGACY_LAVA_BUCKET, Material.LEGACY_WATER_BUCKET
+            BUCKET, LAVA_BUCKET, WATER_BUCKET,
+            AXOLOTL_BUCKET, SALMON_BUCKET, TROPICAL_FISH_BUCKET,
+            COD_BUCKET, PUFFERFISH_BUCKET, TADPOLE_BUCKET,
+            LAVA_BUCKET, POWDER_SNOW_BUCKET, LEGACY_BUCKET,
+            LEGACY_LAVA_BUCKET, LEGACY_WATER_BUCKET
         )
 
         /**
