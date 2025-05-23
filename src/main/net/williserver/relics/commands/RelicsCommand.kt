@@ -84,7 +84,7 @@ class RelicsCommand(
         /**
          * Number of relics to be displayed on a single page of a paged command.
          */
-        const val RELICS_PER_PAGE = 10u
+        const val ENTRIES_PER_PAGE = 10u
 
         /**
          * @param T type of collection being page-ified.
@@ -152,16 +152,17 @@ private class RelicSubcommandExecutor(
             return false
         }
 
+        // TODO: move to object or function
         val sortedRelics = sortRelics(relicSet.relics())
         val numRelics = sortedRelics.size.toUInt()
 
-        var lastPageNumber = numRelics / RELICS_PER_PAGE
+        var lastPageNumber = numRelics / ENTRIES_PER_PAGE
         // Edge case: a multiple of RELICS_PER_PAGE relics -- last page is previous.
-        if (lastPageNumber > 0u && numRelics % RELICS_PER_PAGE == 0u) {
+        if (lastPageNumber > 0u && numRelics % ENTRIES_PER_PAGE == 0u) {
             lastPageNumber--
         }
 
-        /**
+        /*
          * Selected page:
          * - 0 if no / invalid args.
          * - lastPageNumber if out of range.
@@ -176,7 +177,7 @@ private class RelicSubcommandExecutor(
             } else 0u
 
         s.sendMessage(
-            contentsOfPage(sortedRelics, RELICS_PER_PAGE, selectedPage)
+            contentsOfPage(sortedRelics, ENTRIES_PER_PAGE, selectedPage)
             .fold(prefixedMessage(Component.text("All Relics:", NamedTextColor.RED)))
             { message, relic -> message.append(formatRelicEntry(relic)) }
             .append(Component.text("\n\nPage $selectedPage of $lastPageNumber", NamedTextColor.GRAY))
@@ -331,9 +332,9 @@ private class RelicSubcommandExecutor(
          * - Otherwise, args[0] value.
          */
         val numRelics = sortedRelics.size.toUInt()
-        var lastPageNumber = numRelics / RELICS_PER_PAGE
+        var lastPageNumber = numRelics / ENTRIES_PER_PAGE
         // Edge case: a multiple of RELICS_PER_PAGE relics -- last page is previous.
-        if (lastPageNumber > 0u && numRelics % RELICS_PER_PAGE == 0u) {
+        if (lastPageNumber > 0u && numRelics % ENTRIES_PER_PAGE == 0u) {
             lastPageNumber--
         }
         // If user selects out of bounds page, go back to OG.
@@ -343,7 +344,7 @@ private class RelicSubcommandExecutor(
 
         // Send a list of all claimed relics.
         s.sendMessage(
-            contentsOfPage(sortedRelics, RELICS_PER_PAGE, selectedPage)
+            contentsOfPage(sortedRelics, ENTRIES_PER_PAGE, selectedPage)
                 .fold(prefixedMessage(Component.text("Claimed Relics:", NamedTextColor.RED)))
                 { message, relic -> message.append(formatRelicEntry(relic)) }
                 .append(Component.text("\n\nPage $selectedPage of $lastPageNumber", NamedTextColor.GRAY))
@@ -395,13 +396,42 @@ private class RelicSubcommandExecutor(
      * @return true after successfully sending the message.
      */
     fun top(): Boolean {
-        val formattedOwnersByPoints =
-            relicSet
+        // Argument structure validation. One optional argument: page no.
+        if (args.size > 1) {
+            return false
+        }
+
+        val basePlayerList = relicSet
             .playersToRelicPoints()
-            .map { (Bukkit.getOfflinePlayer(it.key).name ?: "Unknown") to it.value }
-            .sortedWith(compareByDescending
+                .map { (Bukkit.getOfflinePlayer(it.key).name ?: "Unknown") to it.value }
+                .sortedWith(compareByDescending
                 { playerToOwned: Pair<String, UInt> -> playerToOwned.second }.thenBy
                 { playerToOwned: Pair<String, UInt> -> playerToOwned.first })
+
+        /*
+         * Selected page:
+         * - 0 if no / invalid args.
+         * - lastPageNumber if out of range.
+         * - Otherwise, args[0] value.
+         */
+        val numPlayers = basePlayerList.size.toUInt()
+        var lastPageNumber = numPlayers / ENTRIES_PER_PAGE
+        // Edge case: a multiple of ENTRIES_PER_PAGE players -- last page is previous.
+        if (lastPageNumber > 0u && numPlayers % ENTRIES_PER_PAGE == 0u) {
+            lastPageNumber--
+        }
+        // If user selects out of bounds page, go back to OG.
+
+        val selectedPage =
+            if (args.isNotEmpty()) {
+                val potentialPage = args[0].toUIntOrNull() ?: 0u
+                if (potentialPage > lastPageNumber) {
+                    lastPageNumber
+                } else potentialPage
+            } else 0u
+
+        val formattedOwnersByPoints =
+            contentsOfPage(basePlayerList, ENTRIES_PER_PAGE, selectedPage)
             .fold(prefixedMessage(Component.text("Top Players:", NamedTextColor.RED)))
             { acc, (name, points) ->
                 acc.append(
@@ -410,6 +440,7 @@ private class RelicSubcommandExecutor(
                         .append(Component.text(" ($points points)", NamedTextColor.GRAY))
                 )
             }
+            .append(Component.text("\n\nPage $selectedPage of $lastPageNumber", NamedTextColor.GRAY))
 
         s.sendMessage(formattedOwnersByPoints)
         return true
