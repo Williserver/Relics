@@ -19,6 +19,7 @@ import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import java.util.UUID
 
 /**
  * The RelicsCommand class represents a command related to relics.
@@ -129,7 +130,7 @@ private class RelicSubcommandExecutor(
 
         val help = generateCommandHelp("help", "pull up this help menu")
         val info = generateCommandHelp("info [name]", "get information about a specific relic by name")
-        val list = generateCommandHelp("list", "list all relics")
+        val list = generateCommandHelp("list (ownername) (page no)", "list all relics")
         val top = generateCommandHelp("top (page no)", "list a ranking of players by the number of relic points they have.")
 
         s.sendMessage(header
@@ -275,29 +276,78 @@ private class RelicSubcommandExecutor(
      * @return Whether the command was invoked with the correct number of arguments.
      */
     fun list(): Boolean {
-        // Argument structure validation. One optional arg: name of player.
-        if (args.size > 1) {
+        // Argument structure validation. Two optional args: (name of player, page no)
+        if (args.size > 2) {
             return false
         }
 
-        // Get the target player, if provided.
-        val target =
-            if (args.isNotEmpty()) {
-                Bukkit.getOfflinePlayer(args[0]).let {
-                    if (!it.hasPlayedBefore()) {
-                        sendErrorMessage(s, "The player you specified has never joined the server.")
-                        return true
-                    } else it.uniqueId
+        // Parse args.
+        var ownerId: UUID? = null
+        var selectedPage = 0u
+
+        // If two args, playerName is first, page is second.
+        if (args.size == 2) {
+            ownerId = getPlayerFromName(args[0])
+            if (ownerId == null) {
+                sendErrorMessage(s, "Player \"${args[0]}\" not found.")
+                return true
+            }
+            args[1].toUIntOrNull().let {
+                if (it == null) {
+                    sendErrorMessage(s, "Invalid page number: ${args[1]}")
+                    return true
+                } else {
+                    selectedPage = it
                 }
-            } else null
+            }
+        // If one arg, either a player name or a page number.
+        // Keep in mind: a player name may be only numbers -- they will have to use two args.
+        } else if (args.size == 1) {
+            args[0].toUIntOrNull().let {
+                if (it != null) {
+                    selectedPage = it
+                } else {
+                    ownerId = getPlayerFromName(args[0])
+                    if (ownerId == null) {
+                        sendErrorMessage(s, "Player \"${args[0]}\" not found.")
+                        return true
+                    }
+                }
+            }
+        }
+
+        // Get set of relics to consider.
+        val baseRelics =
+            if (ownerId != null) {
+                relicSet.ownedRelics().filter { relicSet.ownerOf(it) == ownerId }
+            } else relicSet.relics()
+        val sortedRelics = sortRelics(baseRelics)
+
+        /*
+         * Selected page:
+         * - 0 if no / invalid args.
+         * - lastPageNumber if out of range.
+         * - Otherwise, args[0] value.
+         */
+        val numRelics = sortedRelics.size.toUInt()
+        var lastPageNumber = numRelics / RELICS_PER_PAGE
+        // Edge case: a multiple of RELICS_PER_PAGE relics -- last page is previous.
+        if (lastPageNumber > 0u && numRelics % RELICS_PER_PAGE == 0u) {
+            lastPageNumber--
+        }
+        // If user selects out of bounds page, go back to OG.
+        if (selectedPage > lastPageNumber) {
+            selectedPage = lastPageNumber
+        }
 
         // Send a list of all claimed relics.
         s.sendMessage(
-            sortRelics(relicSet.ownedRelics())
-            .filter { target == null || relicSet.ownerOf(it) == target}
-            .fold(prefixedMessage(Component.text("Claimed Relics:", NamedTextColor.RED)))
+            contentsOfPage(sortedRelics, RELICS_PER_PAGE, selectedPage)
+                .fold(prefixedMessage(Component.text("Claimed Relics:", NamedTextColor.RED)))
                 { message, relic -> message.append(formatRelicEntry(relic)) }
+                .append(Component.text("\n\nPage $selectedPage of $lastPageNumber", NamedTextColor.GRAY))
         )
+
         return true
     }
 
@@ -439,6 +489,16 @@ private class RelicSubcommandExecutor(
                 .append(Component.text(name, NamedTextColor.YELLOW))
                 .append(Component.text(")", NamedTextColor.GRAY))
         }
+
+        /**
+         * Given a name, convert to player UUID.
+         */
+    private fun getPlayerFromName(name: String): UUID? =
+            Bukkit.getOfflinePlayer(name).let {
+                if (!it.hasPlayedBefore()) {
+                    null
+                } else it.uniqueId
+            }
 
 } // end relic subcommand executor
 } // end relics command
