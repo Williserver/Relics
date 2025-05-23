@@ -145,6 +145,11 @@ private class RelicSubcommandExecutor(
      * Report a list of all relics on the server to sender, whether they're owned or not.
      */
     fun all(): Boolean {
+        // Argument structure validation. One optional arg: page to use (default for none: 0)
+        if (args.size > 1) {
+            return false
+        }
+
         val sortedRelics = sortRelics(relicSet.relics())
         val numRelics = sortedRelics.size.toUInt()
 
