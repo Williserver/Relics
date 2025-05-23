@@ -322,7 +322,7 @@ private class RelicSubcommandExecutor(
         val baseRelics =
             if (ownerId != null) {
                 relicSet.ownedRelics().filter { relicSet.ownerOf(it) == ownerId }
-            } else relicSet.relics()
+            } else relicSet.ownedRelics()
         val sortedRelics = sortRelics(baseRelics)
 
         /*
