@@ -11,6 +11,7 @@ import net.williserver.relics.integration.messaging.sendErrorMessage
 import net.williserver.relics.model.Relic
 import net.williserver.relics.model.RelicRarity
 import net.williserver.relics.model.RelicSet
+import net.williserver.relics.model.RelicSet.Companion.sortRelics
 import net.williserver.relics.session.RelicEvent
 import net.williserver.relics.session.RelicEventBus
 import org.bukkit.Bukkit
@@ -144,7 +145,7 @@ private class RelicSubcommandExecutor(
      * Report a list of all relics on the server to sender, whether they're owned or not.
      */
     fun all(): Boolean {
-        val sortedRelics = relicSet.relics().sortedByDescending { it.rarity.ordinal }
+        val sortedRelics = sortRelics(relicSet.relics())
         val numRelics = sortedRelics.size.toUInt()
 
         var lastPageNumber = numRelics / RELICS_PER_PAGE
@@ -286,9 +287,8 @@ private class RelicSubcommandExecutor(
             } else null
 
         // Send a list of all claimed relics.
-        s.sendMessage(relicSet
-            .ownedRelics()
-            .sortedByDescending { it.rarity.ordinal }
+        s.sendMessage(
+            sortRelics(relicSet.ownedRelics())
             .filter { target == null || relicSet.ownerOf(it) == target}
             .fold(prefixedMessage(Component.text("Claimed Relics:", NamedTextColor.RED)))
                 { message, relic -> message.append(formatRelicEntry(relic)) }

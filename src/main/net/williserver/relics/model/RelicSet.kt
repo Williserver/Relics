@@ -189,8 +189,14 @@ class RelicSet(private val relicsToOwner: MutableMap<Relic, SUUID> = mutableMapO
             logger.info("Relic set loaded from file.")
             return relicSet
         }
-    }
-}
+
+        /**
+         * @param relics Set of relics to sort.
+         * @return a new set of relics sorted by rarity and then name.
+         */
+        fun sortRelics(relics: Collection<Relic>) = relics.sortedWith(compareByDescending { relic: Relic -> relic.rarity.points() }.thenBy { it.name} )
+    } // End static helpers
+} // End RelicSet
 
 
 /**
