@@ -1,10 +1,7 @@
 package net.williserver.relics.integration.serverevents
 
 import io.papermc.paper.event.block.CompostItemEvent
-import io.papermc.paper.event.player.PlayerTradeEvent
-import net.kyori.adventure.text.Component
 import net.williserver.relics.integration.item.RelicItemStackIntegrator
-import org.bukkit.Bukkit
 import org.bukkit.entity.Item
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -22,7 +19,6 @@ import org.bukkit.event.inventory.InventoryType
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.inventory.AnvilInventory
-import org.bukkit.inventory.MerchantInventory
 
 /**
  * Listener to handle the destruction of Relic-based item stacks across various game events.

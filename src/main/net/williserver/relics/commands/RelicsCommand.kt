@@ -77,6 +77,20 @@ class RelicsCommand(
          * @return the name with spaces replaced by underscores.
          */
         fun spacesToUnderscores(name: String) = name.replace(" ", "_")
+
+        /**
+         * Number of relics to be displayed on a single page of a paged command.
+         */
+        const val RELICS_PER_PAGE = 10u
+
+        /**
+         * @param T type of collection being page-ified.
+         * @param entries Collection of paged entries to see.
+         * @param entriesPerPage How many entries of the collection should be on a single page.
+         * @return The subset of the collection corresponding to the selected page.
+         */
+        fun<T> contentsOfPage(entries: Collection<T>, entriesPerPage: UInt, selectedPage: UInt) =
+            entries.drop(selectedPage.toInt() * entriesPerPage.toInt()).take(entriesPerPage.toInt())
     } // End static helpers
 
 /**
@@ -115,7 +129,7 @@ private class RelicSubcommandExecutor(
         val help = generateCommandHelp("help", "pull up this help menu")
         val info = generateCommandHelp("info [name]", "get information about a specific relic by name")
         val list = generateCommandHelp("list", "list all relics")
-        val top = generateCommandHelp("top", "list a ranking of players by the number of relic points they have.")
+        val top = generateCommandHelp("top (page no)", "list a ranking of players by the number of relic points they have.")
 
         s.sendMessage(header
             .append(help)
@@ -130,11 +144,34 @@ private class RelicSubcommandExecutor(
      * Report a list of all relics on the server to sender, whether they're owned or not.
      */
     fun all(): Boolean {
-        s.sendMessage(relicSet
-            .relics()
-            .sortedByDescending { it.rarity.ordinal }
+        val sortedRelics = relicSet.relics().sortedByDescending { it.rarity.ordinal }
+        val numRelics = sortedRelics.size.toUInt()
+
+        var lastPageNumber = numRelics / RELICS_PER_PAGE
+        // Edge case: a multiple of RELICS_PER_PAGE relics -- last page is previous.
+        if (lastPageNumber > 0u && numRelics % RELICS_PER_PAGE == 0u) {
+            lastPageNumber--
+        }
+
+        /**
+         * Selected page:
+         * - 0 if no / invalid args.
+         * - lastPageNumber if out of range.
+         * - Otherwise, args[0] value.
+         */
+        val selectedPage =
+            if (args.isNotEmpty()) {
+                val potentialPage = args[0].toUIntOrNull() ?: 0u
+                if (potentialPage > lastPageNumber) {
+                    lastPageNumber
+                } else potentialPage
+            } else 0u
+
+        s.sendMessage(
+            contentsOfPage(sortedRelics, RELICS_PER_PAGE, selectedPage)
             .fold(prefixedMessage(Component.text("All Relics:", NamedTextColor.RED)))
             { message, relic -> message.append(formatRelicEntry(relic)) }
+            .append(Component.text("\n\nPage $selectedPage of $lastPageNumber", NamedTextColor.GRAY))
         )
         return true
     }
