@@ -20,6 +20,7 @@ import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import java.util.UUID
+import kotlin.collections.sortedWith
 
 /**
  * The RelicsCommand class represents a command related to relics.
@@ -398,7 +399,9 @@ private class RelicSubcommandExecutor(
             relicSet
             .playersToRelicPoints()
             .map { (Bukkit.getOfflinePlayer(it.key).name ?: "Unknown") to it.value }
-            .sortedByDescending { it.second }
+            .sortedWith(compareByDescending
+                { playerToOwned: Pair<String, UInt> -> playerToOwned.second }.thenBy
+                { playerToOwned: Pair<String, UInt> -> playerToOwned.first })
             .fold(prefixedMessage(Component.text("Top Players:", NamedTextColor.RED)))
             { acc, (name, points) ->
                 acc.append(
