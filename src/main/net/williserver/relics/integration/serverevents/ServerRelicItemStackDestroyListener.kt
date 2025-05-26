@@ -2,6 +2,7 @@ package net.williserver.relics.integration.serverevents
 
 import io.papermc.paper.event.block.CompostItemEvent
 import net.williserver.relics.integration.item.RelicItemStackIntegrator
+import org.bukkit.Material
 import org.bukkit.entity.Item
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -37,7 +38,8 @@ class ServerRelicItemStackDestroyListener(
      */
     @EventHandler
     fun onBlockPlace(event: BlockPlaceEvent) = event.itemInHand.let {
-        if (integrator.hasRelicMetadata(it)) {
+        if (integrator.hasRelicMetadata(it)
+            && it.type !in AXES) {
             event.isCancelled = true
         }
     }
@@ -161,4 +163,13 @@ class ServerRelicItemStackDestroyListener(
 
     @EventHandler
     fun onCompostItem(event: CompostItemEvent) = integrator.purgeIfRelic(event.item)
+
+    companion object {
+        /**
+         * Axe materials are in hand when a BlockPlace event is triggered, but should not result in event cancellation.
+         */
+        val AXES = setOf(
+            Material.WOODEN_AXE, Material.STONE_AXE, Material.IRON_AXE, Material.GOLDEN_AXE, Material.DIAMOND_AXE,
+        )
+    }
 }
