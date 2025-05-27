@@ -58,7 +58,7 @@ class RelicsCommandValidator(private val s: CommandSender,
     fun assertHeldItemValidMaterial() =
         if (s !is Player) {
             throw IllegalArgumentException("This function should only be run by players -- this should have been checked earlier!")
-        } else if (!Relic.validMaterial(s.inventory.itemInMainHand.type)) {
+        } else if (!RelicItemStackIntegrator.validMaterial(s.inventory.itemInMainHand.type)) {
             sendErrorMessage(s, "This item cannot be registered as a relic.")
             false
         } else true

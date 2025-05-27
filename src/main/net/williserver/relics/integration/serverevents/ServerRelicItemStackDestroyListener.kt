@@ -2,7 +2,8 @@ package net.williserver.relics.integration.serverevents
 
 import io.papermc.paper.event.block.CompostItemEvent
 import net.williserver.relics.integration.item.RelicItemStackIntegrator
-import org.bukkit.Material
+import net.williserver.relics.integration.item.RelicItemStackIntegrator.Companion.ACCEPTABLE_INVENTORIES
+import net.williserver.relics.integration.item.RelicItemStackIntegrator.Companion.AXES
 import org.bukkit.entity.Item
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -16,7 +17,6 @@ import org.bukkit.event.inventory.CraftItemEvent
 import org.bukkit.event.inventory.FurnaceBurnEvent
 import org.bukkit.event.inventory.FurnaceSmeltEvent
 import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.event.inventory.InventoryType
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.inventory.AnvilInventory
@@ -107,16 +107,8 @@ class ServerRelicItemStackDestroyListener(
     fun checkMoveRelicAcceptableInventory(event: InventoryClickEvent) {
         // Ignore clicks on empty slots.
         if (event.clickedInventory == null) return
-
         // It is always OK to move items between acceptable inventories.
-        val acceptableInventories = setOf(
-            InventoryType.PLAYER,
-            InventoryType.CHEST,
-            InventoryType.ENDER_CHEST,
-            InventoryType.ANVIL,
-            InventoryType.ENCHANTING
-        )
-        if (event.clickedInventory!!.type in acceptableInventories) return
+        if (event.clickedInventory!!.type in ACCEPTABLE_INVENTORIES) return
 
         // Otherwise, check that we haven't placed a relic in an unacceptable inventory.
         if (event.cursor.hasItemMeta() && integrator.hasRelicMetadata(event.cursor)) {
@@ -163,13 +155,4 @@ class ServerRelicItemStackDestroyListener(
 
     @EventHandler
     fun onCompostItem(event: CompostItemEvent) = integrator.purgeIfRelic(event.item)
-
-    companion object {
-        /**
-         * Axe materials are in hand when a BlockPlace event is triggered, but should not result in event cancellation.
-         */
-        val AXES = setOf(
-            Material.WOODEN_AXE, Material.STONE_AXE, Material.IRON_AXE, Material.GOLDEN_AXE, Material.DIAMOND_AXE,
-        )
-    }
 }
