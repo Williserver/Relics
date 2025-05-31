@@ -32,3 +32,6 @@ permissions:
   relics.help:
     description: Allows /relics help
     default: true
+  relics.top:
+    description: Allows /relics top
+    default: true
