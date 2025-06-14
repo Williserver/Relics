@@ -144,7 +144,8 @@ class RelicItemStackIntegrator(instance: Plugin,
             InventoryType.CHEST,
             InventoryType.ENDER_CHEST,
             InventoryType.ANVIL,
-            InventoryType.ENCHANTING
+            InventoryType.ENCHANTING,
+            InventoryType.BARREL,
         )
 
         /**
