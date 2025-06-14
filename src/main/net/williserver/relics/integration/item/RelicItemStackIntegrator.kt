@@ -133,7 +133,14 @@ class RelicItemStackIntegrator(instance: Plugin,
          * Axe materials are in hand when a BlockPlace event is triggered, but should not result in event cancellation.
          */
         val AXES = setOf(
-            Material.WOODEN_AXE, Material.STONE_AXE, Material.IRON_AXE, Material.GOLDEN_AXE, Material.DIAMOND_AXE,
+            WOODEN_AXE, STONE_AXE, IRON_AXE, GOLDEN_AXE, DIAMOND_AXE, NETHERITE_AXE
+        )
+
+        /**
+         * Hoe materials are in hand when a BlockPlace event is triggered, but should not result in event cancellation.
+         */
+        val HOES = setOf(
+            WOODEN_HOE, IRON_HOE, GOLDEN_HOE, DIAMOND_HOE, NETHERITE_HOE
         )
 
         /**

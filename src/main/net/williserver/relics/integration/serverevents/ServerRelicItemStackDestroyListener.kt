@@ -4,6 +4,7 @@ import io.papermc.paper.event.block.CompostItemEvent
 import net.williserver.relics.integration.item.RelicItemStackIntegrator
 import net.williserver.relics.integration.item.RelicItemStackIntegrator.Companion.ACCEPTABLE_INVENTORIES
 import net.williserver.relics.integration.item.RelicItemStackIntegrator.Companion.AXES
+import net.williserver.relics.integration.item.RelicItemStackIntegrator.Companion.HOES
 import org.bukkit.entity.Item
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -39,7 +40,8 @@ class ServerRelicItemStackDestroyListener(
     @EventHandler
     fun onBlockPlace(event: BlockPlaceEvent) = event.itemInHand.let {
         if (integrator.hasRelicMetadata(it)
-            && it.type !in AXES) {
+            && it.type !in AXES
+            && it.type !in HOES) {
             event.isCancelled = true
         }
     }
