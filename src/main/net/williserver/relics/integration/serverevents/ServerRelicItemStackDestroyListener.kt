@@ -107,13 +107,30 @@ class ServerRelicItemStackDestroyListener(
      */
     @EventHandler
     fun checkMoveRelicAcceptableInventory(event: InventoryClickEvent) {
+        // NOTE: we only check for movement to top inventory.
+        // Inductive invariant: bottom inventory is always acceptable due to our checking.
+
+        val targetInventory =
+            if (event.isShiftClick) {
+                event.view.topInventory
+            } else {
+                event.clickedInventory
+            }
+
+        val targetItem =
+            if (event.isShiftClick) {
+                event.clickedInventory?.contents[event.slot]
+            } else {
+                event.cursor
+            }
+
         // Ignore clicks on empty slots.
-        if (event.clickedInventory == null) return
+        if (targetInventory == null || targetItem == null) return
         // It is always OK to move items between acceptable inventories.
-        if (event.clickedInventory!!.type in ACCEPTABLE_INVENTORIES) return
+        if (targetInventory.type in ACCEPTABLE_INVENTORIES) return
 
         // Otherwise, check that we haven't placed a relic in an unacceptable inventory.
-        if (event.cursor.hasItemMeta() && integrator.hasRelicMetadata(event.cursor)) {
+        if (targetItem.hasItemMeta() && integrator.hasRelicMetadata(targetItem)) {
             event.isCancelled = true
         }
     }
