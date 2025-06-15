@@ -153,6 +153,7 @@ class RelicItemStackIntegrator(instance: Plugin,
             InventoryType.ANVIL,
             InventoryType.ENCHANTING,
             InventoryType.BARREL,
+            InventoryType.SHULKER_BOX,
         )
 
         /**
